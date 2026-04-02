@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../common/Toast';
 import { documentsApi, ApiError } from '../../services/api';
 import type { CollaboratorInfo } from '../../services/api';
+import { ConfirmationModal } from '../common/ConfirmationModal';
 import './CollaboratorPanel.css';
 
 interface CollaboratorPanelProps {
@@ -21,6 +22,7 @@ export function CollaboratorPanel({ documentId, isPublic, ownerId }: Collaborato
   const [email, setEmail] = useState('');
   const [isInviting, setIsInviting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [removingUser, setRemovingUser] = useState<{ id: string; name: string } | null>(null);
 
   const isOwner = user?.id === ownerId;
 
@@ -68,14 +70,15 @@ export function CollaboratorPanel({ documentId, isPublic, ownerId }: Collaborato
     }
   };
 
-  const handleRemove = async (userId: string, displayName: string) => {
-    if (!token) return;
+  const handleRemove = async () => {
+    if (!token || !removingUser) return;
     try {
-      const res = await documentsApi.removeCollaborator(token, documentId, userId);
+      const res = await documentsApi.removeCollaborator(token, documentId, removingUser.id);
       if (res.data?.collaborators) {
         setCollaborators(res.data.collaborators);
       }
-      showToast(`${displayName} removed from document`, 'success');
+      showToast(`${removingUser.name} removed from document`, 'success');
+      setRemovingUser(null);
     } catch (err) {
       const message = err instanceof ApiError ? err.message : 'Failed to remove collaborator';
       showToast(message, 'error');
@@ -144,7 +147,7 @@ export function CollaboratorPanel({ documentId, isPublic, ownerId }: Collaborato
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleRemove(collab._id, collab.displayName)}
+                    onClick={() => setRemovingUser({ id: collab._id, name: collab.displayName })}
                     aria-label={`Remove ${collab.displayName}`}
                     data-tooltip="Remove collaborator"
                     className="collab-panel__remove-btn"
@@ -189,6 +192,16 @@ export function CollaboratorPanel({ documentId, isPublic, ownerId }: Collaborato
           </div>
         </div>
       )}
+
+      <ConfirmationModal
+        isOpen={!!removingUser}
+        onClose={() => setRemovingUser(null)}
+        onConfirm={handleRemove}
+        title="Remove Collaborator"
+        message={`Are you sure you want to remove ${removingUser?.name} from this document? They will lose access immediately.`}
+        confirmText="Remove"
+        variant="danger"
+      />
     </div>
   );
 }
