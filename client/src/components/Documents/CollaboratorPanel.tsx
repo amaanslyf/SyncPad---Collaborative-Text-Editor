@@ -105,8 +105,10 @@ export function CollaboratorPanel({ documentId, isPublic, ownerId }: Collaborato
   return (
     <div className="collab-panel">
       <div className="collab-panel__header">
-        <h3 className="collab-panel__title">Collaborators</h3>
-        <span className="collab-panel__count">{collaborators.length + 1}</span>
+        <h3 className="collab-panel__title">
+          {isPublic ? 'Document Access' : 'Collaborators'}
+        </h3>
+        {!isPublic && <span className="collab-panel__count">{collaborators.length + 1}</span>}
       </div>
 
       <div className="collab-panel__badge-row">
@@ -131,8 +133,8 @@ export function CollaboratorPanel({ documentId, isPublic, ownerId }: Collaborato
         </div>
       )}
 
-      {/* Members */}
-      {collaborators.length > 0 && (
+      {/* Members — Only for Private documents */}
+      {!isPublic && collaborators.length > 0 && (
         <div className="collab-panel__section">
           <div className="collab-panel__section-label">Members</div>
           <div className="collab-panel__list">
@@ -161,14 +163,14 @@ export function CollaboratorPanel({ documentId, isPublic, ownerId }: Collaborato
         </div>
       )}
 
-      {collaborators.length === 0 && !isPublic && (
+      {!isPublic && collaborators.length === 0 && (
         <div className="collab-panel__empty">
           No collaborators yet. Invite someone below!
         </div>
       )}
 
-      {/* Invite */}
-      {isOwner && (
+      {/* Invite — Only for Private documents and Owners */}
+      {!isPublic && isOwner && (
         <div className="collab-panel__invite">
           <div className="collab-panel__section-label">Invite by email</div>
           <div className="collab-panel__invite-row">

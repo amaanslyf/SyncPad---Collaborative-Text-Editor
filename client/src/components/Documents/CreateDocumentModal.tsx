@@ -148,60 +148,62 @@ export function CreateDocumentModal({ isOpen, onClose, onCreate }: CreateDocumen
           </div>
         </div>
 
-        {/* Email invite section — slides in when Private is selected */}
-        <div className={`invite-emails-section ${!isPublic ? 'invite-emails-section--visible' : ''}`}>
-          <label className="input-label">Invite Collaborators</label>
-          <p className="invite-emails-section__hint">
-            Add emails of users you want to collaborate with. They must have a SyncPad account.
-          </p>
-          <div className="invite-emails-section__input-row">
-            <input
-              className="input invite-emails-section__input"
-              type="email"
-              value={emailInput}
-              onChange={(e) => {
-                setEmailInput(e.target.value);
-                setEmailError('');
-              }}
-              onKeyDown={handleEmailKeyDown}
-              placeholder="user@example.com"
-              disabled={isCreating}
-            />
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={addEmail}
-              disabled={isCreating || !emailInput.trim()}
-            >
-              Add
-            </Button>
-          </div>
-          {emailError && <p className="invite-emails-section__error">{emailError}</p>}
-
-          {emails.length > 0 && (
-            <div className="email-chip-list">
-              {emails.map((email) => (
-                <span key={email} className="email-chip">
-                  <span className="email-chip__text">{email}</span>
-                  <button
-                    type="button"
-                    className="email-chip__remove"
-                    onClick={() => removeEmail(email)}
-                    aria-label={`Remove ${email}`}
-                  >
-                    ✕
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
-
-          {emails.length === 0 && (
-            <p className="invite-emails-section__empty">
-              No collaborators added yet. You can also invite people later from the editor.
+        {/* Email invite section — only for Private documents */}
+        {!isPublic && (
+          <div className="invite-emails-section">
+            <label className="input-label">Invite Collaborators</label>
+            <p className="invite-emails-section__hint">
+              Add emails of users you want to collaborate with. They must have a SyncPad account.
             </p>
-          )}
-        </div>
+            <div className="invite-emails-section__input-row">
+              <input
+                className="input invite-emails-section__input"
+                type="email"
+                value={emailInput}
+                onChange={(e) => {
+                  setEmailInput(e.target.value);
+                  setEmailError('');
+                }}
+                onKeyDown={handleEmailKeyDown}
+                placeholder="user@example.com"
+                disabled={isCreating}
+              />
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={addEmail}
+                disabled={isCreating || !emailInput.trim()}
+              >
+                Add
+              </Button>
+            </div>
+            {emailError && <p className="invite-emails-section__error">{emailError}</p>}
+
+            {emails.length > 0 && (
+              <div className="email-chip-list">
+                {emails.map((email) => (
+                  <span key={email} className="email-chip">
+                    <span className="email-chip__text">{email}</span>
+                    <button
+                      type="button"
+                      className="email-chip__remove"
+                      onClick={() => removeEmail(email)}
+                      aria-label={`Remove ${email}`}
+                    >
+                      ✕
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {emails.length === 0 && (
+              <p className="invite-emails-section__empty">
+                No collaborators added yet. You can also invite people later from the editor.
+              </p>
+            )}
+          </div>
+        )}
       </div>
     </Modal>
   );
