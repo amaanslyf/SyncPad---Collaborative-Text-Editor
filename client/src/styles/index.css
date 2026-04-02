@@ -1,0 +1,342 @@
+/* ═══════════════════════════════════════════════════════════════
+   SyncPad — Global Styles & Design System CSS Custom Properties
+   Derived from "Nocturne Glass" design system (Google Stitch)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── CSS Custom Properties (Design Tokens) ─────────────── */
+:root {
+  /* Colors — Surfaces */
+  --color-background: #0c0c1d;
+  --color-surface: #0c0c1d;
+  --color-surface-dim: #0c0c1d;
+  --color-surface-bright: #2a2a43;
+  --color-surface-container: #18182b;
+  --color-surface-container-low: #121223;
+  --color-surface-container-high: #1d1d33;
+  --color-surface-container-highest: #24233b;
+  --color-surface-container-lowest: #000000;
+  --color-surface-variant: #24233b;
+
+  /* Colors — Primary */
+  --color-primary: #a8a4ff;
+  --color-primary-dim: #675df9;
+  --color-primary-container: #9995ff;
+  --color-on-primary: #1e009f;
+  --color-on-primary-fixed: #000000;
+
+  /* Colors — Secondary */
+  --color-secondary: #9891ff;
+  --color-secondary-container: #3d31ad;
+  --color-on-secondary-container: #cfcbff;
+
+  /* Colors — Tertiary */
+  --color-tertiary: #ff9dd0;
+  --color-tertiary-dim: #eb7bb8;
+
+  /* Colors — Error */
+  --color-error: #ff6e84;
+  --color-error-dim: #d73357;
+  --color-on-error-container: #ffb2b9;
+
+  /* Colors — Text */
+  --color-on-background: #e6e3fb;
+  --color-on-surface: #e6e3fb;
+  --color-on-surface-variant: #aba9bf;
+
+  /* Colors — Outline */
+  --color-outline: #757388;
+  --color-outline-variant: #474659;
+
+  /* Colors — Semantic */
+  --color-success: #00D68F;
+  --color-warning: #FFB800;
+  --color-info: #00D4FF;
+
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.8125rem;
+  --font-size-md: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 2rem;
+  --font-size-4xl: 2.5rem;
+  --font-size-5xl: 3rem;
+
+  /* Spacing */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.5);
+  --shadow-ambient: 0 8px 32px -4px rgba(230, 227, 251, 0.06);
+  --shadow-glow: 0 0 20px rgba(168, 164, 255, 0.3);
+  --shadow-glow-strong: 0 0 40px rgba(168, 164, 255, 0.4);
+
+  /* Glass */
+  --glass-bg: rgba(36, 35, 59, 0.6);
+  --glass-blur: blur(12px);
+  --glass-border: rgba(71, 70, 89, 0.15);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 300ms ease;
+  --transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Z-index */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-popover: 500;
+  --z-tooltip: 600;
+  --z-toast: 700;
+}
+
+/* ─── Reset & Base Styles ────────────────────────────────── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  color: var(--color-on-surface);
+  background-color: var(--color-background);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Links ──────────────────────────────────────────────── */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-primary-container);
+}
+
+/* ─── Selections ─────────────────────────────────────────── */
+::selection {
+  background-color: rgba(168, 164, 255, 0.3);
+  color: var(--color-on-surface);
+}
+
+/* ─── Scrollbar (Webkit) ─────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-outline-variant);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-outline);
+}
+
+/* ─── Focus Visible ──────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ─── Utility Classes ────────────────────────────────────── */
+.text-primary { color: var(--color-primary); }
+.text-secondary { color: var(--color-on-surface-variant); }
+.text-error { color: var(--color-error); }
+.text-success { color: var(--color-success); }
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+}
+
+.gradient-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dim));
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ─── Background Gradient Orbs (Ambient Decoration) ──────── */
+.bg-orbs {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.bg-orbs::before,
+.bg-orbs::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.15;
+  animation: float 20s ease-in-out infinite;
+}
+
+.bg-orbs::before {
+  width: 600px;
+  height: 600px;
+  background: var(--color-primary-dim);
+  top: -200px;
+  right: -100px;
+}
+
+.bg-orbs::after {
+  width: 500px;
+  height: 500px;
+  background: var(--color-tertiary-dim);
+  bottom: -150px;
+  left: -100px;
+  animation-delay: -10s;
+  animation-direction: reverse;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -30px) scale(1.05); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+/* ─── Animations ─────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-fade-in { animation: fadeIn var(--transition-slow) ease forwards; }
+.animate-fade-in-up { animation: fadeInUp var(--transition-slow) ease forwards; }
+.animate-fade-in-down { animation: fadeInDown var(--transition-slow) ease forwards; }
+.animate-scale-in { animation: scaleIn var(--transition-slow) ease forwards; }
+.animate-slide-in-right { animation: slideInRight var(--transition-slow) ease forwards; }
+.animate-pulse { animation: pulse 2s ease-in-out infinite; }
+
+/* Skeleton loading shimmer */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-container) 25%,
+    var(--color-surface-container-high) 37%,
+    var(--color-surface-container) 63%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}

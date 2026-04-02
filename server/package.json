@@ -1,0 +1,42 @@
+{
+  "name": "syncpad-server",
+  "version": "1.0.0",
+  "description": "SyncPad — Real-time collaborative editor backend",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "keywords": ["syncpad", "collaborative-editor", "websocket", "yjs", "crdt"],
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "lib0": "^0.2.99",
+    "mongoose": "^8.10.1",
+    "nanoid": "^5.0.9",
+    "ws": "^8.18.0",
+    "y-mongodb-provider": "^0.1.9",
+    "y-protocols": "^1.0.6",
+    "yjs": "^13.6.22"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.0.1",
+    "globals": "^15.14.0",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.4.2",
+    "vitest": "^3.0.4"
+  }
+}
