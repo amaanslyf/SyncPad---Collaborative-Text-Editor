@@ -1,6 +1,7 @@
 import Document from '../models/Document.js';
 import User from '../models/User.js';
-import { disconnectUserFromDoc } from '../services/websocket.js';
+import { disconnectUserFromDoc, destroyRoom } from '../services/websocket.js';
+import { getPersistence } from '../services/persistence.js';
 import { createLogger } from '../utils/logger.js';
 
 const log = createLogger('DocumentController');
@@ -243,6 +244,20 @@ export const deleteDocument = async (req, res, next) => {
       });
     }
 
+    // 1. Purge Yjs state from MongoDB (y-mongodb-provider collection)
+    try {
+      const mdb = getPersistence();
+      await mdb.clearDocument(req.params.id);
+      log.info(`Deleted Yjs data for doc: ${req.params.id}`);
+    } catch (err) {
+      log.error(`Failed to clear Yjs data for doc ${req.params.id}:`, err.message);
+      // Continue anyway to delete the metadata
+    }
+
+    // 2. Clear memory room in WebSocket service
+    destroyRoom(req.params.id);
+
+    // 3. Delete metadata record in Mongoose
     await Document.findByIdAndDelete(req.params.id);
 
     log.info(`Document deleted: "${document.title}" (${document._id}) by ${req.user.displayName}`);

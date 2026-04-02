@@ -266,6 +266,25 @@ export const disconnectUserFromDoc = (documentId, userId) => {
 };
 
 /**
+ * Force-destroy a document room in memory.
+ * Used when a document is deleted to ensure no "ghost" flushes happen.
+ */
+export const destroyRoom = (docId) => {
+  const doc = docs.get(docId);
+  if (!doc) return;
+
+  log.info(`Force-destroying room "${docId}" (document deleted)`);
+  
+  if (doc.flushTimer) {
+    clearTimeout(doc.flushTimer);
+    doc.flushTimer = null;
+  }
+
+  doc.destroy();
+  docs.delete(docId);
+};
+
+/**
  * Set up the WebSocket server on an existing HTTP server
  */
 export const setupWebSocket = (server) => {
@@ -378,4 +397,4 @@ export const flushAllDocuments = async () => {
   log.info(`All ${docs.size} documents flushed`);
 };
 
-export default { setupWebSocket, disconnectUserFromDoc, flushAllDocuments };
+export default { setupWebSocket, disconnectUserFromDoc, destroyRoom, flushAllDocuments };
