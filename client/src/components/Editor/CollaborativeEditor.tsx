@@ -1,4 +1,5 @@
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useEffect } from 'react';
+import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Collaboration from '@tiptap/extension-collaboration';
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
@@ -16,6 +17,7 @@ interface CollaborativeEditorProps {
   provider: WebsocketProvider | null;
   isConnected: boolean;
   isSynced: boolean;
+  onEditorReady?: (editor: Editor) => void;
 }
 
 export function CollaborativeEditor({
@@ -23,6 +25,7 @@ export function CollaborativeEditor({
   provider,
   isConnected,
   isSynced,
+  onEditorReady,
 }: CollaborativeEditorProps) {
   const { user } = useAuth();
 
@@ -57,6 +60,12 @@ export function CollaborativeEditor({
       },
     },
   }, [ydoc, provider]);
+
+  useEffect(() => {
+    if (editor && onEditorReady) {
+      onEditorReady(editor);
+    }
+  }, [editor, onEditorReady]);
 
   if (!isSynced) {
     return (

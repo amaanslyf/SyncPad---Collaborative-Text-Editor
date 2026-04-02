@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import * as Y from 'yjs';
+import type { Editor } from '@tiptap/react';
 import { Layout } from '../components/Layout/Layout';
 import { Header } from '../components/Layout/Header';
 import { CollaborativeEditor } from '../components/Editor/CollaborativeEditor';
@@ -22,6 +22,7 @@ export function EditorPage() {
   const [docTitle, setDocTitle] = useState('');
   const [docNotFound, setDocNotFound] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [editor, setEditor] = useState<Editor | null>(null);
 
   // Initialize collaboration
   const { ydoc, provider, isConnected, isSynced } = useCollaboration({
@@ -62,50 +63,40 @@ export function EditorPage() {
     return () => clearTimeout(timeout);
   }, [docTitle, token, id]);
 
-  // Get Yjs state as base64 for revision snapshots
+  // Get editor state as JSON string (base64 encoded) for revision snapshots
   const handleGetSnapshot = useCallback((): string | null => {
+    if (!editor) return null;
     try {
-      const state = Y.encodeStateAsUpdate(ydoc);
-      // Convert Uint8Array to base64
-      let binary = '';
-      const bytes = new Uint8Array(state);
-      bytes.forEach((b) => (binary += String.fromCharCode(b)));
-      return btoa(binary);
+      const jsonStr = JSON.stringify(editor.getJSON());
+      // API expects base64 string because it previously stored binary Yjs states
+      return btoa(unescape(encodeURIComponent(jsonStr)));
     } catch {
       return null;
     }
-  }, [ydoc]);
+  }, [editor]);
 
-  // Restore Yjs state from base64 snapshot
+  // Restore document from JSON snapshot (base64 encoded)
   const handleRestoreSnapshot = useCallback(
-    (snapshotBase64: string) => {
+    (snapshotStr: string) => {
+      if (!editor) return;
       try {
-        const binary = atob(snapshotBase64);
-        const bytes = new Uint8Array(binary.length);
-        for (let i = 0; i < binary.length; i++) {
-          bytes[i] = binary.charCodeAt(i);
+        let content;
+        try {
+          const jsonStr = decodeURIComponent(escape(atob(snapshotStr)));
+          content = JSON.parse(jsonStr);
+        } catch {
+          throw new Error('Incompatible snapshot format. Only new snapshots can be restored.');
         }
 
-        // Apply restoration in a transaction to satisfy atomicity and performance
-        ydoc.transact(() => {
-          // Clear current content before restoration to ensure a hard reset
-          // Tiptap uses the "default" type by default
-          const type = ydoc.getText('default');
-          if (type.length > 0) {
-            type.delete(0, type.length);
-          }
-          
-          // Apply the snapshot state
-          Y.applyUpdate(ydoc, bytes);
-        });
-
+        // Tiptap handles the transaction and Yjs translation automatically!
+        editor.commands.setContent(content);
         showToast('Document restored from snapshot', 'success');
       } catch (err) {
         console.error('Failed to restore snapshot:', err);
-        showToast('Failed to restore snapshot', 'error');
+        showToast(err instanceof Error ? err.message : 'Failed to restore snapshot', 'error');
       }
     },
-    [ydoc, showToast]
+    [editor, showToast]
   );
 
   if (docNotFound) {
@@ -152,6 +143,7 @@ export function EditorPage() {
             provider={provider}
             isConnected={isConnected}
             isSynced={isSynced}
+            onEditorReady={setEditor}
           />
         </div>
         <aside className={`editor-page__sidebar ${!sidebarOpen ? 'editor-page__sidebar--collapsed' : ''}`}>

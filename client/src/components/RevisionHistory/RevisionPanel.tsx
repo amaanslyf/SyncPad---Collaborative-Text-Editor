@@ -104,7 +104,6 @@ export function RevisionPanel({ documentId, ydoc, onGetSnapshot, onRestoreSnapsh
       const res = await documentsApi.getRevisionSnapshot(token, documentId, restoreId);
       if (res.data?.snapshot) {
         onRestoreSnapshot(res.data.snapshot);
-        showToast('Version restored!', 'success');
       }
     } catch (err) {
       showToast(
