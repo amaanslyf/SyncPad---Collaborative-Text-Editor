@@ -5,10 +5,15 @@ import { Button } from '../common/Button';
 import { Spinner } from '../common/Spinner';
 import { useToast } from '../common/Toast';
 import { ConfirmationModal } from '../common/ConfirmationModal';
+import { createLogger } from '../../utils/logger';
+import type * as Y from 'yjs';
 import './RevisionHistory.css';
+
+const log = createLogger('RevisionPanel');
 
 interface RevisionPanelProps {
   documentId: string;
+  ydoc: Y.Doc;
   /** Called to get the current Yjs state as base64 */
   onGetSnapshot: () => string | null;
   /** Called to restore from a base64 snapshot */
@@ -25,7 +30,7 @@ function formatDate(dateStr: string): string {
   });
 }
 
-export function RevisionPanel({ documentId, onGetSnapshot, onRestoreSnapshot }: RevisionPanelProps) {
+export function RevisionPanel({ documentId, ydoc, onGetSnapshot, onRestoreSnapshot }: RevisionPanelProps) {
   const { token } = useAuth();
   const { showToast } = useToast();
   const [revisions, setRevisions] = useState<RevisionMeta[]>([]);
@@ -50,6 +55,18 @@ export function RevisionPanel({ documentId, onGetSnapshot, onRestoreSnapshot }: 
     fetchRevisions();
   }, [fetchRevisions]);
 
+  // Listen for real-time revision updates via Yjs shared state
+  useEffect(() => {
+    if (!ydoc) return;
+    const meta = ydoc.getMap('meta');
+    const observeHandler = () => {
+      log.debug('Revision update signaled via Yjs');
+      fetchRevisions();
+    };
+    meta.observe(observeHandler);
+    return () => meta.unobserve(observeHandler);
+  }, [ydoc, fetchRevisions]);
+
   const handleSaveSnapshot = async () => {
     if (!token) return;
     setIsSaving(true);
@@ -63,6 +80,11 @@ export function RevisionPanel({ documentId, onGetSnapshot, onRestoreSnapshot }: 
         label: `Manual snapshot`,
         snapshot,
       });
+
+      // Signal all connected clients to refresh their revision list
+      const meta = ydoc.getMap('meta');
+      meta.set('lastRevisionAt', Date.now());
+
       showToast('Snapshot saved!', 'success');
       fetchRevisions();
     } catch (err) {

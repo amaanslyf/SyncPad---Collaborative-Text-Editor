@@ -85,9 +85,23 @@ export function EditorPage() {
         for (let i = 0; i < binary.length; i++) {
           bytes[i] = binary.charCodeAt(i);
         }
-        Y.applyUpdate(ydoc, bytes);
+
+        // Apply restoration in a transaction to satisfy atomicity and performance
+        ydoc.transact(() => {
+          // Clear current content before restoration to ensure a hard reset
+          // Tiptap uses the "default" type by default
+          const type = ydoc.getText('default');
+          if (type.length > 0) {
+            type.delete(0, type.length);
+          }
+          
+          // Apply the snapshot state
+          Y.applyUpdate(ydoc, bytes);
+        });
+
         showToast('Document restored from snapshot', 'success');
-      } catch {
+      } catch (err) {
+        console.error('Failed to restore snapshot:', err);
         showToast('Failed to restore snapshot', 'error');
       }
     },
@@ -144,6 +158,7 @@ export function EditorPage() {
           <UserPresence users={users} variant="full" />
           <RevisionPanel
             documentId={id}
+            ydoc={ydoc}
             onGetSnapshot={handleGetSnapshot}
             onRestoreSnapshot={handleRestoreSnapshot}
           />
