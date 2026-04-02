@@ -21,7 +21,12 @@ export function Header({ docTitle, onTitleChange, isConnected, showBack }: Heade
     <header className="header">
       <div className="header__left">
         {showBack && (
-          <Link to="/" className="btn btn--ghost btn--icon" aria-label="Back to documents">
+          <Link 
+            to="/" 
+            className="btn btn--ghost btn--icon" 
+            aria-label="Back to documents"
+            title="Back to documents"
+          >
             ←
           </Link>
         )}

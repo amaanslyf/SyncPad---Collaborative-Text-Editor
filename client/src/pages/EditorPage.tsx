@@ -170,6 +170,7 @@ export function EditorPage() {
               zIndex: 100,
             }}
             aria-label="Show sidebar"
+            title="Show sidebar"
           >
             ☰
           </Button>

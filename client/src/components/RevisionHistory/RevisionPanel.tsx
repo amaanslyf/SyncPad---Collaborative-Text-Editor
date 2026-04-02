@@ -95,7 +95,13 @@ export function RevisionPanel({ documentId, onGetSnapshot, onRestoreSnapshot }: 
     <div className="revision-panel">
       <div className="revision-panel__header">
         <span className="revision-panel__title">History</span>
-        <Button variant="ghost" size="sm" onClick={handleSaveSnapshot} isLoading={isSaving}>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={handleSaveSnapshot} 
+          isLoading={isSaving}
+          title="Save current version to history"
+        >
           📸 Save
         </Button>
       </div>
@@ -119,7 +125,13 @@ export function RevisionPanel({ documentId, onGetSnapshot, onRestoreSnapshot }: 
                 </div>
               </div>
               <div className="revision-item__action">
-                <Button variant="ghost" size="sm" onClick={() => handleRestore(rev.id)}>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => handleRestore(rev.id)}
+                  title="Restore this version"
+                  aria-label="Restore this version"
+                >
                   ↩
                 </Button>
               </div>
