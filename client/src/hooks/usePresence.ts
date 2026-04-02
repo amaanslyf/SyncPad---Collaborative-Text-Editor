@@ -37,19 +37,24 @@ export function usePresence(provider: WebsocketProvider | null): UsePresenceRetu
     if (!provider) return;
 
     const states = provider.awareness.getStates();
-    const currentUsers: PresenceUser[] = [];
+    const uniqueUsers = new Map<string, PresenceUser>();
 
     states.forEach((state, clientId) => {
+      // Skip local user and users without profile info
       if (state.user && clientId !== provider.awareness.clientID) {
-        currentUsers.push({
-          clientId,
-          name: state.user.name || 'Anonymous',
-          color: state.user.color || '#a8a4ff',
-          cursor: state.cursor || null,
-        });
+        // If we haven't seen this user yet, or they have a cursor (active), prioritize its display
+        if (!uniqueUsers.has(state.user.name)) {
+          uniqueUsers.set(state.user.name, {
+            clientId,
+            name: state.user.name || 'Anonymous',
+            color: state.user.color || '#a8a4ff',
+            cursor: state.cursor || null,
+          });
+        }
       }
     });
 
+    const currentUsers = Array.from(uniqueUsers.values());
     setUsers(currentUsers);
     log.debug(`Awareness update: ${currentUsers.length} remote user(s) online`);
   }, [provider]);

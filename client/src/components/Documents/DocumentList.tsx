@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDocuments } from '../../hooks/useDocuments';
 import { DocumentCard, CreateDocumentCard } from './DocumentCard';
 import { Spinner } from '../common/Spinner';
 import { useToast } from '../common/Toast';
+import { ConfirmationModal } from '../common/ConfirmationModal';
 import './Documents.css';
 
 export function DocumentList() {
@@ -11,6 +12,8 @@ export function DocumentList() {
     useDocuments();
   const navigate = useNavigate();
   const { showToast } = useToast();
+  
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchDocuments();
@@ -27,10 +30,15 @@ export function DocumentList() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('Delete this document? This cannot be undone.')) {
-      await deleteDocument(id);
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    try {
+      await deleteDocument(deleteId);
       showToast('Document deleted', 'success');
+    } catch (err) {
+      showToast('Failed to delete document', 'error');
+    } finally {
+      setDeleteId(null);
     }
   };
 
@@ -66,9 +74,19 @@ export function DocumentList() {
           className="animate-fade-in-up"
           style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'backwards' }}
         >
-          <DocumentCard document={doc} onDelete={handleDelete} />
+          <DocumentCard document={doc} onDelete={(id) => setDeleteId(id)} />
         </div>
       ))}
+
+      <ConfirmationModal
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={confirmDelete}
+        title="Delete Document"
+        message="Are you sure you want to delete this document? This action cannot be undone."
+        confirmText="Delete"
+        variant="danger"
+      />
     </div>
   );
 }

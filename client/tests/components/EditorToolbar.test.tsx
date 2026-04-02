@@ -28,13 +28,13 @@ describe('EditorToolbar', () => {
     // @ts-expect-error — simplified mock
     render(<EditorToolbar editor={mockEditor} />);
 
-    expect(screen.getByTitle('Bold (Ctrl+B)')).toBeInTheDocument();
-    expect(screen.getByTitle('Italic (Ctrl+I)')).toBeInTheDocument();
-    expect(screen.getByTitle('Underline (Ctrl+U)')).toBeInTheDocument();
-    expect(screen.getByTitle('Heading 1')).toBeInTheDocument();
-    expect(screen.getByTitle('Heading 2')).toBeInTheDocument();
-    expect(screen.getByTitle('Bullet List')).toBeInTheDocument();
-    expect(screen.getByTitle('Blockquote')).toBeInTheDocument();
+    expect(screen.getByLabelText('Bold (Ctrl+B)')).toBeInTheDocument();
+    expect(screen.getByLabelText('Italic (Ctrl+I)')).toBeInTheDocument();
+    expect(screen.getByLabelText('Underline (Ctrl+U)')).toBeInTheDocument();
+    expect(screen.getByLabelText('Heading 1')).toBeInTheDocument();
+    expect(screen.getByLabelText('Heading 2')).toBeInTheDocument();
+    expect(screen.getByLabelText('Bullet List')).toBeInTheDocument();
+    expect(screen.getByLabelText('Blockquote')).toBeInTheDocument();
   });
 
   it('returns null when editor is null', () => {
@@ -47,9 +47,9 @@ describe('EditorToolbar', () => {
     // @ts-expect-error — simplified mock
     render(<EditorToolbar editor={mockEditor} />);
 
-    const boldBtn = screen.getByTitle('Bold (Ctrl+B)');
-    const italicBtn = screen.getByTitle('Italic (Ctrl+I)');
-    const underlineBtn = screen.getByTitle('Underline (Ctrl+U)');
+    const boldBtn = screen.getByLabelText('Bold (Ctrl+B)');
+    const italicBtn = screen.getByLabelText('Italic (Ctrl+I)');
+    const underlineBtn = screen.getByLabelText('Underline (Ctrl+U)');
 
     expect(boldBtn.className).toContain('editor-toolbar__btn--active');
     expect(italicBtn.className).toContain('editor-toolbar__btn--active');
@@ -80,7 +80,7 @@ describe('EditorToolbar', () => {
     // @ts-expect-error — simplified mock
     render(<EditorToolbar editor={mockEditor} />);
 
-    await user.click(screen.getByTitle('Bold (Ctrl+B)'));
+    await user.click(screen.getByLabelText('Bold (Ctrl+B)'));
     expect(runFn).toHaveBeenCalledOnce();
   });
 });

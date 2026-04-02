@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Avatar } from '../common/Avatar';
 import { Button } from '../common/Button';
+import { ConfirmationModal } from '../common/ConfirmationModal';
 import './Layout.css';
 
 interface HeaderProps {
@@ -16,6 +18,7 @@ interface HeaderProps {
 
 export function Header({ docTitle, onTitleChange, isConnected, showBack }: HeaderProps) {
   const { user, logout } = useAuth();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   return (
     <header className="header">
@@ -73,12 +76,21 @@ export function Header({ docTitle, onTitleChange, isConnected, showBack }: Heade
           <div className="header__user">
             <span className="header__user-name">{user.displayName}</span>
             <Avatar name={user.displayName} color={user.color} size="sm" />
-            <Button variant="ghost" size="sm" onClick={logout}>
+            <Button variant="ghost" size="sm" onClick={() => setIsLogoutModalOpen(true)}>
               Logout
             </Button>
           </div>
         )}
       </div>
+
+      <ConfirmationModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={logout}
+        title="Confirm Logout"
+        message="Are you sure you want to log out?"
+        confirmText="Logout"
+      />
     </header>
   );
 }

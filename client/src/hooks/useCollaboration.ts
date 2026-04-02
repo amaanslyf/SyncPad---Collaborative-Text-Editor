@@ -37,8 +37,7 @@ export function useCollaboration({ documentId }: UseCollaborationOptions): UseCo
     const wsUrl = `${WS_URL}/ws/${documentId}`;
     const provider = new WebsocketProvider(wsUrl, documentId, ydoc, {
       params: { token },
-      connect: true,
-      // Reconnect with backoff
+      connect: false, // Initialize without connecting to attach listeners first
       maxBackoffTime: 10000,
     });
 
@@ -56,8 +55,8 @@ export function useCollaboration({ documentId }: UseCollaborationOptions): UseCo
     });
 
     provider.on('sync', (synced: boolean) => {
-      setIsSynced(synced);
       if (synced) {
+        setIsSynced(true);
         log.info(`Document synced: ${documentId}`);
       }
     });
@@ -66,8 +65,27 @@ export function useCollaboration({ documentId }: UseCollaborationOptions): UseCo
       log.error(`WebSocket connection error for document ${documentId}:`, event);
     });
 
+    // START CONNECTION explicitly after listeners are attached
+    provider.connect();
+
+    // SAFETY CHECKS:
+    // 1. Immediate sync check (if already synced from cache or super-fast response)
+    if (provider.synced) {
+      log.debug(`Document already synced on connect: ${documentId}`);
+      setIsSynced(true);
+    }
+
+    // 2. Fallback timeout to prevent permanent "Syncing..." hang
+    const syncFallback = setTimeout(() => {
+      if (!provider.synced && provider.wsconnected) {
+        log.warn(`Sync taking too long for ${documentId} — force revealing editor`);
+        setIsSynced(true);
+      }
+    }, 4000);
+
     return () => {
       log.info(`Disconnecting from document: ${documentId}`);
+      clearTimeout(syncFallback);
       provider.disconnect();
       provider.destroy();
       providerRef.current = null;

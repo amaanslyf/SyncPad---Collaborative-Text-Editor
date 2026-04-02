@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../common/Button';
 import { Spinner } from '../common/Spinner';
 import { useToast } from '../common/Toast';
+import { ConfirmationModal } from '../common/ConfirmationModal';
 import './RevisionHistory.css';
 
 interface RevisionPanelProps {
@@ -30,6 +31,7 @@ export function RevisionPanel({ documentId, onGetSnapshot, onRestoreSnapshot }: 
   const [revisions, setRevisions] = useState<RevisionMeta[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [restoreId, setRestoreId] = useState<string | null>(null);
 
   const fetchRevisions = useCallback(async () => {
     if (!token) return;
@@ -73,12 +75,11 @@ export function RevisionPanel({ documentId, onGetSnapshot, onRestoreSnapshot }: 
     }
   };
 
-  const handleRestore = async (revisionId: string) => {
-    if (!token) return;
-    if (!window.confirm('Restore this version? Current content will be replaced.')) return;
+  const confirmRestore = async () => {
+    if (!token || !restoreId) return;
 
     try {
-      const res = await documentsApi.getRevisionSnapshot(token, documentId, revisionId);
+      const res = await documentsApi.getRevisionSnapshot(token, documentId, restoreId);
       if (res.data?.snapshot) {
         onRestoreSnapshot(res.data.snapshot);
         showToast('Version restored!', 'success');
@@ -88,6 +89,8 @@ export function RevisionPanel({ documentId, onGetSnapshot, onRestoreSnapshot }: 
         err instanceof ApiError ? err.message : 'Failed to restore',
         'error'
       );
+    } finally {
+      setRestoreId(null);
     }
   };
 
@@ -128,7 +131,7 @@ export function RevisionPanel({ documentId, onGetSnapshot, onRestoreSnapshot }: 
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  onClick={() => handleRestore(rev.id)}
+                  onClick={() => setRestoreId(rev.id)}
                   data-tooltip="Restore this version"
                   aria-label="Restore this version"
                 >
@@ -139,6 +142,15 @@ export function RevisionPanel({ documentId, onGetSnapshot, onRestoreSnapshot }: 
           ))}
         </div>
       )}
+
+      <ConfirmationModal
+        isOpen={!!restoreId}
+        onClose={() => setRestoreId(null)}
+        onConfirm={confirmRestore}
+        title="Restore Version"
+        message="Are you sure you want to restore this version? Your current document content will be replaced."
+        confirmText="Restore"
+      />
     </div>
   );
 }
