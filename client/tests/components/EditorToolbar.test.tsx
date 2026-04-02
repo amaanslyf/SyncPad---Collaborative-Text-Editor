@@ -35,6 +35,8 @@ const createMockEditor = (activeMarks: string[] = []) => ({
     }),
   }),
   isActive: (type: string) => activeMarks.includes(type),
+  on: vi.fn(),
+  off: vi.fn(),
 });
 
 describe('EditorToolbar', () => {
@@ -89,6 +91,8 @@ describe('EditorToolbar', () => {
         }),
       }),
       isActive: () => false,
+      on: vi.fn(),
+      off: vi.fn(),
     };
 
     const user = userEvent.setup();
