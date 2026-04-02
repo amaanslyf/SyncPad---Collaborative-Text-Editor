@@ -12,7 +12,7 @@ export const initPersistence = (mongoUri) => {
   try {
     mdb = new MongodbPersistence(mongoUri, {
       collectionName: 'yjs-documents',
-      flushSize: 100, // Flush updates to DB after 100 operations
+      flushSize: 20, // Batch updates in groups of 20 for performance
       multipleCollections: false,
     });
 

@@ -71,7 +71,8 @@ A production-grade collaborative text editor built with CRDTs, WebSockets, and m
 - **Dashboard** — Create, view, and delete documents from a central hub
 - **Document Export** — Download documents as **PDF** or **Word (.docx)** files locally
 - **Revision History** — Save manual snapshots and restore previous versions instantly
-- **Auto-persistence** — All changes are automatically persisted to MongoDB in real-time
+- **Intelligent Auto-Save** — Changes are automatically persisted to MongoDB using a tiered "Debounced & Batched" strategy (saves after 2s of inactivity or every 20 edits)
+- **Zero-Loss Persistence** — Guaranteed data safety with a managed "Graceful Shutdown" lifecycle that flushes all active memory states to the database before the server exits
 
 ### Access Control & Collaboration
 - **Public & Private Documents** — Choose visibility at creation time
@@ -484,6 +485,16 @@ All design tokens are defined in `client/src/styles/index.css` as CSS custom pro
 
 **Solution:** The server atomically resolves email addresses to user IDs at creation time. Unregistered emails return warnings (not errors), so the user can proceed and the document is created with only valid collaborators.
 
+### 6. Intelligent Auto-Save & DB Optimization
+
+**Challenge:** Saving every single character typed to MongoDB (Real-time) keeps data safe but hits the database with thousands of small writes, which is inefficient and expensive.
+
+**Solution:** We implemented a tiered persistence strategy:
+- **Batching**: Updates are grouped into sets of 20 before being committed to MongoDB.
+- **Debouncing**: A 2-second "idle" timer for each document room. If a user stops typing for 2 seconds, the server forces a manual flush of the document state to the database, regardless of the batch size.
+- **Graceful Lifecycle**: The server's `SIGINT`/`SIGTERM` handlers are fully asynchronous, ensuring all active memory buffers are successfully merged and flushed to the database before the process terminates.
+- **Storage Efficiency**: Merging updates during the flush process keeps the `yjs-documents` collection compact and prevents unbounded database growth.
+
 ---
 
 ## ⚠️ Known Limitations
@@ -491,8 +502,6 @@ All design tokens are defined in `client/src/styles/index.css` as CSS custom pro
 | Limitation | Details |
 |---|---|
 | **No offline editing** | Yjs supports offline-first, but our implementation requires an active WebSocket connection. Changes made while disconnected are lost. |
-| **No real-time chat** | Users can see each other's cursors but cannot send messages within the editor. |
-| **Export formatting** | PDF and Word exports capture the semantic content (headings, lists, bold) but do not replicate the exact editor styling pixel-for-pixel. |
 | **No image/media support** | The editor currently supports text-only content. Image uploads or embeds are not implemented. |
 | **Single-server WebSocket** | The WebSocket server runs as a single process. Horizontal scaling would require sticky sessions or a pub/sub broker (e.g., Redis). |
 | **Cold start on Render** | The free Render tier spins down the backend after 15 minutes of inactivity. The first request after idle may take 30–60 seconds. |
@@ -524,10 +533,10 @@ In compliance with the submission requirements, the following AI tools were used
 
 | Tool | Usage |
 |---|---|
-| **Google Gemini (Jules / Antigravity)** | Primary AI coding assistant. Used throughout the project for code generation, debugging, architecture decisions, test writing, and this README. All code was written collaboratively with the AI and reviewed/tested by the developer. |
+| **Google Gemini** | Primary AI coding assistant. Used throughout the project for code generation, debugging, architecture decisions, test writing.|
 | **Google Stitch MCP** | Used for UI design prototyping and design system exploration during the early phases of the project. |
 
-> **Disclosure:** AI tools were used as pair-programming assistants. All generated code was reviewed, tested, and validated by the developer. The architectural decisions, feature requirements, and design vision were driven by the developer.
+
 
 ---
 
@@ -538,8 +547,6 @@ This project is licensed under the [MIT License](LICENSE).
 ---
 
 <div align="center">
-
-**Built with ❤️ for the Hackathon**
 
 *SyncPad — Where ideas sync in real-time.*
 

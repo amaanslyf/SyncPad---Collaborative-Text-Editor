@@ -5,7 +5,7 @@ import { createServer } from 'http';
 
 import connectDB from './config/db.js';
 import { initPersistence } from './services/persistence.js';
-import { setupWebSocket } from './services/websocket.js';
+import { setupWebSocket, flushAllDocuments } from './services/websocket.js';
 import authRoutes from './routes/auth.js';
 import documentRoutes from './routes/documents.js';
 import errorHandler from './middleware/errorHandler.js';
@@ -109,14 +109,35 @@ process.on('uncaughtException', (error) => {
   process.exit(1);
 });
 
+
 // Graceful shutdown
-process.on('SIGTERM', () => {
-  log.info('SIGTERM received — shutting down gracefully');
-  server.close(() => {
-    log.info('Server closed');
+const shutdown = async (signal) => {
+  log.info(`${signal} received — shutting down gracefully`);
+  
+  try {
+    // 1. Stop accepting new connections
+    const closeServer = () => new Promise((resolve) => {
+      server.close(() => {
+        log.info('HTTP server closed');
+        resolve();
+      });
+    });
+
+    await closeServer();
+
+    // 2. Flush all Yjs documents to MongoDB
+    await flushAllDocuments();
+    
+    log.info('Graceful shutdown complete');
     process.exit(0);
-  });
-});
+  } catch (err) {
+    log.error('Error during graceful shutdown:', err);
+    process.exit(1);
+  }
+};
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
 
 start();
 

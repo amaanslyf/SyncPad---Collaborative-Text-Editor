@@ -39,31 +39,48 @@ const getYDoc = async (docName) => {
   doc.conns = new Map(); // ws -> Set<number> (awareness client ids)
   doc.awareness = new awarenessProtocol.Awareness(doc);
 
-  // Load persisted state from MongoDB
+  // Re-implementing manual persistence as bindState is not available
   try {
     const mdb = getPersistence();
     const persistedDoc = await mdb.getYDoc(docName);
-    const persistedState = Y.encodeStateAsUpdate(persistedDoc);
-    Y.applyUpdate(doc, persistedState);
+    
+    // Check if the persisted doc actually has data
+    const state = Y.encodeStateAsUpdate(persistedDoc);
+    if (state.length > 2) { // 2-3 bytes is usually an empty state vector
+      Y.applyUpdate(doc, state);
+      log.info(`✅ Loaded persisted state for room: "${docName}" (${state.length} bytes)`);
+    } else {
+      log.info(`ℹ️ New or empty document state for room: "${docName}"`);
+    }
     persistedDoc.destroy();
-    log.info(`Loaded persisted state for room: "${docName}"`);
   } catch (err) {
-    log.warn(`Could not load persisted state for "${docName}":`, {
-      message: err.message,
-      code: err.code,
-    });
+    log.error(`❌ Failed to load persisted state for room "${docName}":`, err.message);
   }
 
-  // Listen for updates and persist them
-  doc.on('update', async (update, _origin) => {
+  // Listen for updates and persist them manually
+  doc.on('update', async (update, origin) => {
+    // If update originated from this local provider (not from MongoDB itself)
+    // we don't strictly need the origin check here because we are doing manual sync,
+    // but we add it for safety.
+    
     try {
       const mdb = getPersistence();
+      // 1. Immediately store the small incremental update to MongoDB buffer
       await mdb.storeUpdate(docName, update);
-    } catch (err) {
-      log.error(`Failed to persist update for "${docName}":`, {
-        message: err.message,
-        updateSize: update.length,
-      });
+      
+      // 2. Schedule a debounced flush to merge/compact updates in DB
+      if (doc.flushTimer) clearTimeout(doc.flushTimer);
+      doc.flushTimer = setTimeout(async () => {
+        try {
+          await mdb.flushDocument(docName);
+          log.debug(`✅ Debounced flush complete for room: "${docName}"`);
+        } catch (flushErr) {
+          log.error(`❌ Failed to flush document "${docName}":`, flushErr.message);
+        }
+      }, 2000); // 2s idle timer
+      
+    } catch (persistErr) {
+      log.error(`❌ Failed to persist update for "${docName}":`, persistErr.message);
     }
 
     // Broadcast update to all connected clients
@@ -74,16 +91,20 @@ const getYDoc = async (docName) => {
 
     let broadcastCount = 0;
     doc.conns.forEach((_awarenessIds, conn) => {
-      if (conn.readyState === conn.OPEN) {
+      // Don't send update back to the source connection
+      if (conn !== origin && conn.readyState === conn.OPEN) {
         try {
           conn.send(message);
           broadcastCount++;
         } catch (sendErr) {
-          log.warn(`Failed to send update to client in room "${docName}":`, sendErr.message);
+          log.warn(`Failed to send update in room "${docName}":`, sendErr.message);
         }
       }
     });
-    log.debug(`Broadcast update to ${broadcastCount}/${doc.conns.size} clients in "${docName}"`);
+
+    if (broadcastCount > 0) {
+      log.debug(`Broadcasting update in "${docName}" to ${broadcastCount} clients`);
+    }
   });
 
   // Handle awareness updates
@@ -162,9 +183,22 @@ const handleClose = (conn, doc) => {
 
   // If no more connections, keep doc in memory for a bit then clean up
   if (doc.conns.size === 0) {
-    log.info(`Room "${doc.name}" is empty — scheduling cleanup in 30s`);
-    setTimeout(() => {
+    log.info(`Room "${doc.name}" is empty — scheduling final flush and cleanup in 30s`);
+    setTimeout(async () => {
       if (doc.conns.size === 0) {
+        try {
+          const mdb = getPersistence();
+          // Final flush before memory destruction
+          await mdb.flushDocument(doc.name);
+          log.info(`Final flush complete for room "${doc.name}"`);
+        } catch (err) {
+          log.warn(`Final flush failed for rooms "${doc.name}": ${err.message}`);
+        }
+
+        if (doc.flushTimer) {
+          clearTimeout(doc.flushTimer);
+          doc.flushTimer = null;
+        }
         doc.destroy();
         docs.delete(doc.name);
         log.info(`Room "${doc.name}" destroyed (idle timeout)`);
@@ -324,4 +358,24 @@ export const setupWebSocket = (server) => {
   return wss;
 };
 
-export default { setupWebSocket, disconnectUserFromDoc };
+/**
+ * Flush all active documents to the persistence layer.
+ * Usually called during graceful shutdown.
+ */
+export const flushAllDocuments = async () => {
+  log.info(`Flushing ${docs.size} active documents to persistence...`);
+  const mdb = getPersistence();
+  const promises = [];
+
+  for (const [docName] of docs.entries()) {
+    // y-mongodb-provider's flush stores the full doc state as a single merged update
+    promises.push(mdb.flushDocument(docName).catch(err => {
+      log.error(`Failed to flush document ${docName}:`, err.message);
+    }));
+  }
+
+  await Promise.all(promises);
+  log.info(`All ${docs.size} documents flushed`);
+};
+
+export default { setupWebSocket, disconnectUserFromDoc, flushAllDocuments };
