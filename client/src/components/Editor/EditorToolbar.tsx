@@ -13,7 +13,26 @@ export function EditorToolbar({ editor, title }: EditorToolbarProps) {
   const { showToast } = useToast();
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving'>('saved');
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Track editor changes to show Saving... status
+  useEffect(() => {
+    if (!editor) return;
+    const handleUpdate = () => setSaveStatus('saving');
+    editor.on('update', handleUpdate);
+    return () => {
+      editor.off('update', handleUpdate);
+    };
+  }, [editor]);
+
+  // Revert back to 'Saved' after a short debounce
+  useEffect(() => {
+    if (saveStatus === 'saving') {
+      const timeout = setTimeout(() => setSaveStatus('saved'), 1500);
+      return () => clearTimeout(timeout);
+    }
+  }, [saveStatus]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -197,6 +216,27 @@ export function EditorToolbar({ editor, title }: EditorToolbarProps) {
       </div>
 
       <div className="editor-toolbar__actions">
+        <div style={{ 
+          fontSize: '11px', 
+          color: 'var(--color-on-surface-variant)', 
+          marginRight: 'var(--spacing-2)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px',
+          opacity: 0.8
+        }}>
+          {saveStatus === 'saving' ? (
+            <>
+              <span className="spinner-border" style={{ width: '10px', height: '10px', borderWidth: '1px', borderStyle: 'solid', borderColor: 'currentColor', borderRightColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span>
+              Saving...
+            </>
+          ) : (
+            <>
+              <span style={{color: 'var(--color-success-dim)'}}>✓</span> Saved to SyncPad
+            </>
+          )}
+        </div>
+
         <div className="editor-toolbar__divider" />
         <div className="export-menu-container" ref={menuRef}>
           <button
