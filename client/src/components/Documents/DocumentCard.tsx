@@ -31,7 +31,7 @@ export function DocumentCard({ document: doc, onDelete }: DocumentCardProps) {
       <div className="doc-card__owner">
         by {doc.owner?.displayName || 'Unknown'}
         {doc.isPublic && (
-          <span className="doc-card__badge" title="Public document">
+          <span className="doc-card__badge" data-tooltip="Public document">
             🌍
           </span>
         )}
@@ -62,6 +62,7 @@ export function DocumentCard({ document: doc, onDelete }: DocumentCardProps) {
               onDelete(doc._id);
             }}
             aria-label={`Delete ${doc.title}`}
+            data-tooltip="Delete document"
           >
             🗑
           </Button>
