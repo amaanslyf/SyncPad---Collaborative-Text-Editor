@@ -84,11 +84,14 @@ export const exportService = {
         </html>
       `;
 
-      const blob = await htmlToDocx(fullHtml, null, {
+      const result = await htmlToDocx(fullHtml, null, {
         table: { row: { cantSplit: true } },
         footer: true,
         pageNumber: true,
       });
+
+      // Wrap in Blob if it returns a Buffer/Uint8Array
+      const blob = new Blob([result], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
 
       // Browser download mechanism
       const url = window.URL.createObjectURL(blob);
