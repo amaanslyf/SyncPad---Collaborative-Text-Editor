@@ -13,13 +13,27 @@
 .editor-toolbar {
   display: flex;
   align-items: center;
-  gap: var(--spacing-1);
+  justify-content: space-between;
+  gap: var(--spacing-4);
   padding: var(--spacing-2) var(--spacing-4);
   background: var(--color-surface-container);
+  border-bottom: 2px solid var(--color-outline-variant);
+}
+
+.editor-toolbar__main {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
   flex-wrap: wrap;
 }
 
 .editor-toolbar__group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.editor-toolbar__actions {
   display: flex;
   align-items: center;
   gap: var(--spacing-1);
@@ -64,6 +78,89 @@
   outline: 2px solid var(--color-primary);
   outline-offset: 1px;
 }
+
+/* Export Menu */
+.export-menu-container {
+  position: relative;
+}
+
+.export-trigger {
+  width: auto !important;
+  padding: 0 var(--spacing-4) !important;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+}
+
+.export-trigger__arrow {
+  font-size: 8px;
+  opacity: 0.6;
+}
+
+.export-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--color-surface-container-high);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 220px;
+  padding: var(--spacing-2);
+  z-index: var(--z-dropdown);
+  animation: slideDownFade 0.2s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.export-menu__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-3);
+  width: 100%;
+  padding: var(--spacing-3);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--color-on-surface);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition-fast);
+}
+
+.export-menu__item:hover {
+  background: var(--color-surface-container-highest);
+}
+
+.export-menu__icon {
+  font-size: 1.2rem;
+  margin-top: 2px;
+}
+
+.export-menu__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.export-menu__label {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+}
+
+.export-menu__desc {
+  font-size: 0.75rem;
+  color: var(--color-on-surface-variant);
+}
+
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
 /* ─── TipTap Editor ──────────────────────────────────────── */
 .tiptap-wrapper {

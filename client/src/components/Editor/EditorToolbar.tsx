@@ -1,12 +1,53 @@
+import { useState, useRef, useEffect } from 'react';
 import type { Editor } from '@tiptap/react';
+import { exportService } from '../../services/exportService';
+import { useToast } from '../common/Toast';
 import './Editor.css';
 
 interface EditorToolbarProps {
   editor: Editor | null;
+  title: string;
 }
 
-export function EditorToolbar({ editor }: EditorToolbarProps) {
+export function EditorToolbar({ editor, title }: EditorToolbarProps) {
+  const { showToast } = useToast();
+  const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsExportMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   if (!editor) return null;
+
+  const handleExport = async (format: 'pdf' | 'word') => {
+    if (isExporting) return;
+    setIsExporting(true);
+    setIsExportMenuOpen(false);
+    const html = editor.getHTML();
+    
+    try {
+      if (format === 'pdf') {
+        await exportService.exportToPdf(html, title);
+        showToast('Document exported as PDF', 'success');
+      } else {
+        await exportService.exportToWord(html, title);
+        showToast('Document exported as Word', 'success');
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Export failed';
+      showToast(message, 'error');
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const tools = [
     {
@@ -129,29 +170,73 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 
   return (
     <div className="editor-toolbar" role="toolbar" aria-label="Text formatting">
-      {tools.map((group, gi) => (
-        <div key={group.group} style={{ display: 'contents' }}>
-          {gi > 0 && <div className="editor-toolbar__divider" />}
-          <div className="editor-toolbar__group">
-            {group.items.map((tool) => (
-              <button
-                key={tool.id}
-                id={`toolbar-${tool.id}`}
-                className={`editor-toolbar__btn ${tool.isActive() ? 'editor-toolbar__btn--active' : ''}`}
-                onClick={tool.action}
-                data-tooltip={tool.title}
-                data-tooltip-pos="bottom"
-                aria-label={tool.title}
-                aria-pressed={tool.isActive()}
-                style={tool.style}
-                type="button"
-              >
-                {tool.label}
-              </button>
-            ))}
+      <div className="editor-toolbar__main">
+        {tools.map((group, gi) => (
+          <div key={group.group} style={{ display: 'contents' }}>
+            {gi > 0 && <div className="editor-toolbar__divider" />}
+            <div className="editor-toolbar__group">
+              {group.items.map((tool) => (
+                <button
+                  key={tool.id}
+                  id={`toolbar-${tool.id}`}
+                  className={`editor-toolbar__btn ${tool.isActive() ? 'editor-toolbar__btn--active' : ''}`}
+                  onClick={tool.action}
+                  data-tooltip={tool.title}
+                  data-tooltip-pos="bottom"
+                  aria-label={tool.title}
+                  aria-pressed={tool.isActive()}
+                  style={tool.style}
+                  type="button"
+                >
+                  {tool.label}
+                </button>
+              ))}
+            </div>
           </div>
+        ))}
+      </div>
+
+      <div className="editor-toolbar__actions">
+        <div className="editor-toolbar__divider" />
+        <div className="export-menu-container" ref={menuRef}>
+          <button
+            className={`editor-toolbar__btn export-trigger ${isExportMenuOpen ? 'editor-toolbar__btn--active' : ''}`}
+            onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
+            disabled={isExporting}
+            data-tooltip="Export document"
+            data-tooltip-pos="bottom"
+            type="button"
+          >
+            {isExporting ? '...' : 'Export'}
+            <span className="export-trigger__arrow">▼</span>
+          </button>
+          
+          {isExportMenuOpen && (
+            <div className="export-menu">
+              <button 
+                className="export-menu__item" 
+                onClick={() => handleExport('pdf')}
+              >
+                <span className="export-menu__icon">📄</span>
+                <div className="export-menu__text">
+                  <span className="export-menu__label">PDF Document</span>
+                  <span className="export-menu__desc">Standard printable format</span>
+                </div>
+              </button>
+              <button 
+                className="export-menu__item" 
+                onClick={() => handleExport('word')}
+              >
+                <span className="export-menu__icon">📝</span>
+                <div className="export-menu__text">
+                  <span className="export-menu__label">Word Document</span>
+                  <span className="export-menu__desc">Editable .docx file</span>
+                </div>
+              </button>
+            </div>
+          )}
         </div>
-      ))}
+      </div>
     </div>
   );
 }

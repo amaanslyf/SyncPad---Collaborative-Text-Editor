@@ -182,6 +182,7 @@ export function EditorPage() {
             isConnected={isConnected}
             isSynced={isSynced}
             onEditorReady={setEditor}
+            title={docTitle}
           />
         </div>
         <aside className={`editor-page__sidebar ${!sidebarOpen ? 'editor-page__sidebar--collapsed' : ''}`}>

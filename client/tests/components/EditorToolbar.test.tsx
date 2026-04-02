@@ -3,6 +3,21 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { EditorToolbar } from '../../src/components/Editor/EditorToolbar';
 
+// Mock useToast
+vi.mock('../../src/components/common/Toast', () => ({
+  useToast: () => ({
+    showToast: vi.fn(),
+  }),
+}));
+
+// Mock exportService
+vi.mock('../../src/services/exportService', () => ({
+  exportService: {
+    exportToPdf: vi.fn(),
+    exportToWord: vi.fn(),
+  },
+}));
+
 // Mock TipTap editor
 const createMockEditor = (activeMarks: string[] = []) => ({
   chain: () => ({
@@ -26,7 +41,7 @@ describe('EditorToolbar', () => {
   it('renders all formatting buttons', () => {
     const mockEditor = createMockEditor();
     // @ts-expect-error — simplified mock
-    render(<EditorToolbar editor={mockEditor} />);
+    render(<EditorToolbar editor={mockEditor} title="Test Doc" />);
 
     expect(screen.getByLabelText('Bold (Ctrl+B)')).toBeInTheDocument();
     expect(screen.getByLabelText('Italic (Ctrl+I)')).toBeInTheDocument();
@@ -38,14 +53,14 @@ describe('EditorToolbar', () => {
   });
 
   it('returns null when editor is null', () => {
-    const { container } = render(<EditorToolbar editor={null} />);
+    const { container } = render(<EditorToolbar editor={null} title="Test Doc" />);
     expect(container.innerHTML).toBe('');
   });
 
   it('marks active buttons with active class', () => {
     const mockEditor = createMockEditor(['bold', 'italic']);
     // @ts-expect-error — simplified mock
-    render(<EditorToolbar editor={mockEditor} />);
+    render(<EditorToolbar editor={mockEditor} title="Test Doc" />);
 
     const boldBtn = screen.getByLabelText('Bold (Ctrl+B)');
     const italicBtn = screen.getByLabelText('Italic (Ctrl+I)');
@@ -78,7 +93,7 @@ describe('EditorToolbar', () => {
 
     const user = userEvent.setup();
     // @ts-expect-error — simplified mock
-    render(<EditorToolbar editor={mockEditor} />);
+    render(<EditorToolbar editor={mockEditor} title="Test Doc" />);
 
     await user.click(screen.getByLabelText('Bold (Ctrl+B)'));
     expect(runFn).toHaveBeenCalledOnce();

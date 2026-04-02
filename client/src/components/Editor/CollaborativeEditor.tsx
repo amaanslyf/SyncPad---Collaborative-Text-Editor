@@ -18,6 +18,7 @@ interface CollaborativeEditorProps {
   isConnected: boolean;
   isSynced: boolean;
   onEditorReady?: (editor: Editor) => void;
+  title: string;
 }
 
 export function CollaborativeEditor({
@@ -26,6 +27,7 @@ export function CollaborativeEditor({
   isConnected,
   isSynced,
   onEditorReady,
+  title,
 }: CollaborativeEditorProps) {
   const { user } = useAuth();
 
@@ -78,7 +80,7 @@ export function CollaborativeEditor({
 
   return (
     <div className="editor-container">
-      <EditorToolbar editor={editor} />
+      <EditorToolbar editor={editor} title={title} />
       <div className="tiptap-wrapper">
         <EditorContent editor={editor} />
       </div>
