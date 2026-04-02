@@ -18,7 +18,8 @@ export function Avatar({ name, color, size = 'md', className = '' }: AvatarProps
     <span
       className={`avatar avatar--${size} ${className}`.trim()}
       style={{ backgroundColor: color }}
-      title={name}
+      data-tooltip={name}
+      data-tooltip-pos="bottom"
     >
       {initials}
     </span>

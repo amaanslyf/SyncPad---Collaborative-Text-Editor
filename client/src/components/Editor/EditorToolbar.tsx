@@ -139,7 +139,8 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
                 id={`toolbar-${tool.id}`}
                 className={`editor-toolbar__btn ${tool.isActive() ? 'editor-toolbar__btn--active' : ''}`}
                 onClick={tool.action}
-                title={tool.title}
+                data-tooltip={tool.title}
+                data-tooltip-pos="bottom"
                 aria-label={tool.title}
                 aria-pressed={tool.isActive()}
                 style={tool.style}

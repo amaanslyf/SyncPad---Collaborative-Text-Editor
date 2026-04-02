@@ -340,3 +340,77 @@ a:hover {
   animation: shimmer 1.5s ease-in-out infinite;
   border-radius: var(--radius-md);
 }
+
+/* ─── Premium Tooltips ───────────────────────────────────── */
+[data-tooltip] {
+  position: relative;
+  cursor: pointer;
+}
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  background: var(--color-surface-container-highest);
+  color: var(--color-on-surface);
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-outline-variant);
+  z-index: var(--z-tooltip);
+  transition: all var(--transition-base);
+}
+
+/* Tooltip Arrow */
+[data-tooltip]::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  border: 6px solid transparent;
+  border-top-color: var(--color-outline-variant);
+  pointer-events: none;
+  opacity: 0;
+  z-index: var(--z-tooltip);
+  transition: all var(--transition-base);
+}
+
+[data-tooltip]:hover::after,
+[data-tooltip]:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Bottom variant for top icons */
+[data-tooltip-pos="bottom"]::after {
+  bottom: auto;
+  top: calc(100% + 10px);
+  border-top-color: transparent;
+  border-bottom-color: var(--color-surface-container-highest);
+}
+
+[data-tooltip-pos="bottom"]::before {
+  bottom: auto;
+  top: calc(100% + 4px);
+  border-top-color: transparent;
+  border-bottom-color: var(--color-outline-variant);
+}
+
+[data-tooltip-pos="bottom"]:hover::after,
+[data-tooltip-pos="bottom"]:hover::before {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Adjustments for buttons with icons to center perfectly */
+.btn--icon[data-tooltip]::after,
+.editor-toolbar__btn[data-tooltip]::after {
+  font-family: var(--font-family);
+}

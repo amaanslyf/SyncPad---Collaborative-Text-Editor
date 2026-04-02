@@ -100,7 +100,7 @@ export function RevisionPanel({ documentId, onGetSnapshot, onRestoreSnapshot }: 
           size="sm" 
           onClick={handleSaveSnapshot} 
           isLoading={isSaving}
-          title="Save current version to history"
+          data-tooltip="Save current version"
         >
           📸 Save
         </Button>
@@ -129,7 +129,7 @@ export function RevisionPanel({ documentId, onGetSnapshot, onRestoreSnapshot }: 
                   variant="ghost" 
                   size="sm" 
                   onClick={() => handleRestore(rev.id)}
-                  title="Restore this version"
+                  data-tooltip="Restore this version"
                   aria-label="Restore this version"
                 >
                   ↩

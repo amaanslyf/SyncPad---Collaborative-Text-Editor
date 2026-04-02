@@ -25,7 +25,8 @@ export function Header({ docTitle, onTitleChange, isConnected, showBack }: Heade
             to="/" 
             className="btn btn--ghost btn--icon" 
             aria-label="Back to documents"
-            title="Back to documents"
+            data-tooltip="Back to documents"
+            data-tooltip-pos="bottom"
           >
             ←
           </Link>
