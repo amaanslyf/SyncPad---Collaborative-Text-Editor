@@ -1,0 +1,160 @@
+/* ═══════════════════════════════════════════════════════════════
+   SyncPad — Collaborator Panel (Editor Sidebar)
+   ═══════════════════════════════════════════════════════════════ */
+
+.collab-panel {
+  padding: var(--spacing-4);
+}
+
+.collab-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-4);
+}
+
+.collab-panel__title {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--color-on-surface);
+  letter-spacing: -0.01em;
+}
+
+.collab-panel__count {
+  background: var(--color-surface-container-highest);
+  color: var(--color-on-surface-variant);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  min-width: 24px;
+  text-align: center;
+}
+
+.collab-panel__badge-row {
+  margin-bottom: var(--spacing-4);
+}
+
+.collab-panel__access-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.02em;
+}
+
+.collab-panel__access-badge--public {
+  background: rgba(168, 164, 255, 0.1);
+  color: var(--color-primary);
+  border: 1px solid rgba(168, 164, 255, 0.2);
+}
+
+.collab-panel__access-badge--private {
+  background: rgba(255, 157, 207, 0.1);
+  color: var(--color-tertiary);
+  border: 1px solid rgba(255, 157, 207, 0.2);
+}
+
+.collab-panel__section {
+  margin-bottom: var(--spacing-5);
+}
+
+.collab-panel__section-label {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--spacing-3);
+}
+
+.collab-panel__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.collab-panel__user {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-lg);
+  transition: background var(--transition-fast);
+}
+
+.collab-panel__user:hover {
+  background: var(--color-surface-container-high);
+}
+
+.collab-panel__user-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.collab-panel__user-name {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.collab-panel__user-email {
+  font-size: 11px;
+  color: var(--color-on-surface-variant);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.collab-panel__remove-btn {
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.collab-panel__user:hover .collab-panel__remove-btn {
+  opacity: 1;
+}
+
+.collab-panel__empty {
+  font-size: var(--font-size-sm);
+  color: var(--color-on-surface-variant);
+  text-align: center;
+  padding: var(--spacing-4) var(--spacing-2);
+  opacity: 0.7;
+}
+
+.collab-panel__invite {
+  margin-top: var(--spacing-4);
+  padding-top: var(--spacing-4);
+  border-top: 1px solid rgba(70, 70, 92, 0.15);
+}
+
+.collab-panel__invite-row {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: center;
+}
+
+.collab-panel__invite-input {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--font-size-sm) !important;
+  padding: var(--spacing-2) var(--spacing-3) !important;
+}
+
+.collab-panel__loading {
+  font-size: var(--font-size-sm);
+  color: var(--color-on-surface-variant);
+  text-align: center;
+  padding: var(--spacing-6);
+  opacity: 0.5;
+}

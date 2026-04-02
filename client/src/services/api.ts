@@ -103,12 +103,19 @@ export const authApi = {
 };
 
 // ─── Documents API ────────────────────────────────────────
+export interface CollaboratorInfo {
+  _id: string;
+  displayName: string;
+  email: string;
+  color: string;
+}
+
 export interface DocumentMeta {
   _id: string;
   id: string;
   title: string;
   owner: { _id: string; displayName: string; email: string; color: string };
-  collaborators: { _id: string; displayName: string; color: string }[];
+  collaborators: CollaboratorInfo[];
   lastEditedBy?: { displayName: string; color: string };
   isPublic: boolean;
   createdAt: string;
@@ -126,10 +133,10 @@ export const documentsApi = {
   list: (token: string) =>
     apiRequest<{ documents: DocumentMeta[] }>('/documents', { token }),
 
-  create: (token: string, title?: string) =>
-    apiRequest<{ document: DocumentMeta }>('/documents', {
+  create: (token: string, title?: string, isPublic?: boolean, collaboratorEmails?: string[]) =>
+    apiRequest<{ document: DocumentMeta; warnings?: string[] }>('/documents', {
       method: 'POST',
-      body: { title },
+      body: { title, isPublic, collaboratorEmails },
       token,
     }),
 
@@ -160,5 +167,24 @@ export const documentsApi = {
     apiRequest<{ snapshot: string; label: string; createdAt: string }>(
       `/documents/${docId}/revisions/${revisionId}`,
       { token }
+    ),
+
+  // ─── Collaborator API ───────────────────────────────────
+  getCollaborators: (token: string, docId: string) =>
+    apiRequest<{ owner: CollaboratorInfo; collaborators: CollaboratorInfo[]; isPublic: boolean }>(
+      `/documents/${docId}/collaborators`,
+      { token }
+    ),
+
+  addCollaborator: (token: string, docId: string, email: string) =>
+    apiRequest<{ collaborator: CollaboratorInfo; collaborators: CollaboratorInfo[] }>(
+      `/documents/${docId}/collaborators`,
+      { method: 'POST', body: { email }, token }
+    ),
+
+  removeCollaborator: (token: string, docId: string, userId: string) =>
+    apiRequest<{ removedUserId: string; collaborators: CollaboratorInfo[] }>(
+      `/documents/${docId}/collaborators/${userId}`,
+      { method: 'DELETE', token }
     ),
 };

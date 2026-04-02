@@ -30,12 +30,24 @@ export function DocumentCard({ document: doc, onDelete }: DocumentCardProps) {
       <div className="doc-card__title">{doc.title || 'Untitled Document'}</div>
       <div className="doc-card__owner">
         by {doc.owner?.displayName || 'Unknown'}
-        {doc.isPublic && (
+        {doc.isPublic ? (
           <span 
-            className="doc-card__badge" 
-            data-tooltip="Anyone with the link can view"
+            className="doc-card__badge doc-card__badge--public" 
+            data-tooltip="Anyone can view and edit"
           >
             Public
+          </span>
+        ) : (
+          <span 
+            className="doc-card__badge doc-card__badge--private" 
+            data-tooltip="Only invited collaborators"
+          >
+            🔒 Private
+          </span>
+        )}
+        {!doc.isPublic && doc.collaborators && doc.collaborators.length > 0 && (
+          <span className="doc-card__collab-count" data-tooltip={`${doc.collaborators.length} collaborator(s)`}>
+            {doc.collaborators.length} 👤
           </span>
         )}
       </div>

@@ -44,9 +44,7 @@ describe('useDocuments', () => {
       await result.current.fetchDocuments();
     });
 
-    await waitFor(() => {
       expect(result.current.documents).toEqual(mockDocs);
-    });
     expect(documentsApi.list).toHaveBeenCalledWith('fake-jwt-token');
   });
 
@@ -79,7 +77,7 @@ describe('useDocuments', () => {
     await waitFor(() => {
       expect(result.current.documents).toContainEqual(newDoc);
     });
-    expect(documentsApi.create).toHaveBeenCalledWith('fake-jwt-token', 'New Doc');
+    expect(documentsApi.create).toHaveBeenCalledWith('fake-jwt-token', 'New Doc', undefined, undefined);
   });
 
   it('should remove deleted document from state', async () => {

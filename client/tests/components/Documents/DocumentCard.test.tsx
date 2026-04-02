@@ -33,7 +33,8 @@ describe('DocumentCard', () => {
         <DocumentCard document={pubDoc} />
       </MemoryRouter>
     );
-    expect(screen.getByLabelText('Public document')).toBeInTheDocument();
+    expect(screen.getByText('Public')).toBeInTheDocument();
+    expect(screen.queryByText('🔒 Private')).not.toBeInTheDocument();
   });
 
   it('should call onDelete when delete button triggered and confirmed', async () => {

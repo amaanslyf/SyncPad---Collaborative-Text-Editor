@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDocuments } from '../../hooks/useDocuments';
 import { DocumentCard, CreateDocumentCard } from './DocumentCard';
+import { CreateDocumentModal } from './CreateDocumentModal';
 import { Spinner } from '../common/Spinner';
 import { useToast } from '../common/Toast';
 import { ConfirmationModal } from '../common/ConfirmationModal';
@@ -15,6 +16,7 @@ export function DocumentList() {
   const { showToast } = useToast();
   
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   useEffect(() => {
     fetchDocuments();
@@ -24,10 +26,20 @@ export function DocumentList() {
     if (error) showToast(error, 'error');
   }, [error, showToast]);
 
-  const handleCreate = async () => {
-    const doc = await createDocument();
-    if (doc) {
-      navigate(`/doc/${doc._id}`);
+  const handleCreate = async (title: string, isPublic: boolean, emails: string[]) => {
+    try {
+      const result = await createDocument(title, isPublic, emails.length > 0 ? emails : undefined);
+      if (result && result.document) {
+        // Show warnings for unregistered emails
+        if (result.warnings && result.warnings.length > 0) {
+          result.warnings.forEach((w: string) => showToast(w, 'warning'));
+        }
+        setIsCreateModalOpen(false);
+        navigate(`/doc/${result.document._id}`);
+      }
+    } catch (err) {
+      const message = err instanceof ApiError ? err.message : 'Failed to create document';
+      showToast(message, 'error');
     }
   };
 
@@ -55,22 +67,29 @@ export function DocumentList() {
 
   if (documents.length === 0) {
     return (
-      <div className="documents-empty">
-        <div className="documents-empty__icon">📝</div>
-        <h2 className="documents-empty__title">No documents yet</h2>
-        <p className="documents-empty__description">
-          Create your first document and start collaborating in real-time with your team.
-        </p>
-        <button className="btn btn--primary btn--lg" onClick={handleCreate}>
-          Create your first document
-        </button>
-      </div>
+      <>
+        <div className="documents-empty">
+          <div className="documents-empty__icon">📝</div>
+          <h2 className="documents-empty__title">No documents yet</h2>
+          <p className="documents-empty__description">
+            Create your first document and start collaborating in real-time with your team.
+          </p>
+          <button className="btn btn--primary btn--lg" onClick={() => setIsCreateModalOpen(true)}>
+            Create your first document
+          </button>
+        </div>
+        <CreateDocumentModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onCreate={handleCreate}
+        />
+      </>
     );
   }
 
   return (
     <div className="doc-grid">
-      <CreateDocumentCard onClick={handleCreate} />
+      <CreateDocumentCard onClick={() => setIsCreateModalOpen(true)} />
       {documents.map((doc, index) => (
         <div
           key={doc._id}
@@ -89,6 +108,12 @@ export function DocumentList() {
         message="Are you sure you want to delete this document? This action cannot be undone."
         confirmText="Delete"
         variant="danger"
+      />
+
+      <CreateDocumentModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onCreate={handleCreate}
       />
     </div>
   );

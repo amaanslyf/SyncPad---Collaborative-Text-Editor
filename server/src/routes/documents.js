@@ -8,6 +8,9 @@ import {
   getRevisions,
   createRevision,
   getRevisionSnapshot,
+  getCollaborators,
+  addCollaborator,
+  removeCollaborator,
 } from '../controllers/documentController.js';
 import { authenticate } from '../middleware/auth.js';
 
@@ -26,5 +29,10 @@ router.delete('/:id', deleteDocument);
 router.get('/:id/revisions', getRevisions);
 router.post('/:id/revisions', createRevision);
 router.get('/:id/revisions/:revisionId', getRevisionSnapshot);
+
+// Collaborator routes
+router.get('/:id/collaborators', getCollaborators);
+router.post('/:id/collaborators', addCollaborator);
+router.delete('/:id/collaborators/:userId', removeCollaborator);
 
 export default router;

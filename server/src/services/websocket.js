@@ -2,6 +2,7 @@ import { WebSocketServer } from 'ws';
 import * as Y from 'yjs';
 import { getPersistence } from './persistence.js';
 import { authenticateWS } from '../middleware/auth.js';
+import Document from '../models/Document.js';
 import { createLogger } from '../utils/logger.js';
 
 // Dependencies for Yjs WebSocket protocol
@@ -175,6 +176,62 @@ const handleClose = (conn, doc) => {
 };
 
 /**
+ * Check if a user has access to a document for WebSocket connections.
+ * Returns true if access is granted, false otherwise.
+ */
+const checkDocumentAccess = async (documentId, userId) => {
+  try {
+    const document = await Document.findById(documentId).lean();
+    if (!document) {
+      log.warn(`WS access check: document not found: ${documentId}`);
+      return false;
+    }
+
+    // Public documents are accessible to all authenticated users
+    if (document.isPublic) {
+      return true;
+    }
+
+    // Private documents: check owner or collaborator
+    const isOwner = document.owner.toString() === userId;
+    const isCollaborator = document.collaborators.some(
+      (c) => c.toString() === userId
+    );
+
+    if (!isOwner && !isCollaborator) {
+      log.warn(`WS access denied: user ${userId} is not owner/collaborator of doc ${documentId}`);
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    log.error(`WS access check error for doc ${documentId}:`, { message: err.message });
+    return false;
+  }
+};
+
+/**
+ * Disconnect a specific user from a document room.
+ * Used when a collaborator is removed while actively editing.
+ */
+export const disconnectUserFromDoc = (documentId, userId) => {
+  const doc = docs.get(documentId);
+  if (!doc) return;
+
+  doc.conns.forEach((_awarenessIds, conn) => {
+    if (conn.user && conn.user.id === userId) {
+      log.info(`Force-disconnecting user ${conn.user.displayName} from room "${documentId}" (access revoked)`);
+      try {
+        // Send a close frame with code 4403 (custom) + reason
+        conn.close(4403, 'Access revoked');
+      } catch {
+        conn.terminate();
+      }
+    }
+  });
+};
+
+/**
  * Set up the WebSocket server on an existing HTTP server
  */
 export const setupWebSocket = (server) => {
@@ -192,6 +249,8 @@ export const setupWebSocket = (server) => {
       return;
     }
 
+    const documentId = pathParts[1];
+
     // Authenticate via query param token
     const token = url.searchParams.get('token');
     const user = await authenticateWS(token);
@@ -203,9 +262,18 @@ export const setupWebSocket = (server) => {
       return;
     }
 
+    // Check document access for private documents
+    const hasAccess = await checkDocumentAccess(documentId, user.id);
+    if (!hasAccess) {
+      log.warn(`WebSocket upgrade rejected — access denied for user ${user.displayName} on doc ${documentId}`);
+      socket.write('HTTP/1.1 403 Forbidden\r\n\r\n');
+      socket.destroy();
+      return;
+    }
+
     wss.handleUpgrade(request, socket, head, (ws) => {
       ws.user = user;
-      ws.docName = pathParts[1];
+      ws.docName = documentId;
       wss.emit('connection', ws, request);
     });
   });
@@ -256,4 +324,4 @@ export const setupWebSocket = (server) => {
   return wss;
 };
 
-export default { setupWebSocket };
+export default { setupWebSocket, disconnectUserFromDoc };

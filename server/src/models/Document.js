@@ -68,6 +68,7 @@ const documentSchema = new mongoose.Schema(
 // Index for faster queries
 documentSchema.index({ owner: 1, updatedAt: -1 });
 documentSchema.index({ collaborators: 1 });
+documentSchema.index({ isPublic: 1, updatedAt: -1 });
 
 const Document = mongoose.model('Document', documentSchema);
 export default Document;

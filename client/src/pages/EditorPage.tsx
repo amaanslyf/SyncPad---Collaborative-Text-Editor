@@ -6,6 +6,7 @@ import { Header } from '../components/Layout/Header';
 import { CollaborativeEditor } from '../components/Editor/CollaborativeEditor';
 import { UserPresence } from '../components/Presence/UserPresence';
 import { RevisionPanel } from '../components/RevisionHistory/RevisionPanel';
+import { CollaboratorPanel } from '../components/Documents/CollaboratorPanel';
 import { FullPageSpinner } from '../components/common/Spinner';
 import { Button } from '../components/common/Button';
 import { useCollaboration } from '../hooks/useCollaboration';
@@ -21,6 +22,9 @@ export function EditorPage() {
   const { showToast } = useToast();
   const [docTitle, setDocTitle] = useState('');
   const [docNotFound, setDocNotFound] = useState(false);
+  const [accessDenied, setAccessDenied] = useState(false);
+  const [docIsPublic, setDocIsPublic] = useState(true);
+  const [docOwnerId, setDocOwnerId] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [editor, setEditor] = useState<Editor | null>(null);
 
@@ -40,10 +44,16 @@ export function EditorPage() {
         const res = await documentsApi.get(token, id);
         if (res.data?.document) {
           setDocTitle(res.data.document.title);
+          setDocIsPublic(res.data.document.isPublic);
+          setDocOwnerId(res.data.document.owner?._id || '');
         }
       } catch (err) {
-        if (err instanceof ApiError && err.status === 404) {
-          setDocNotFound(true);
+        if (err instanceof ApiError) {
+          if (err.status === 404) {
+            setDocNotFound(true);
+          } else if (err.status === 403) {
+            setAccessDenied(true);
+          }
         }
       }
     };
@@ -99,6 +109,34 @@ export function EditorPage() {
     [editor, showToast]
   );
 
+  // Access denied state
+  if (accessDenied) {
+    return (
+      <Layout>
+        <Header />
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flex: 1,
+          gap: 'var(--spacing-4)',
+          padding: 'var(--spacing-8)',
+        }}>
+          <div style={{ fontSize: '3rem', opacity: 0.6 }}>🔒</div>
+          <h2 style={{ color: 'var(--color-on-surface)', fontSize: 'var(--font-size-2xl)' }}>
+            Access Denied
+          </h2>
+          <p style={{ color: 'var(--color-on-surface-variant)', textAlign: 'center', maxWidth: '400px' }}>
+            You don't have permission to view this document.
+            Ask the document owner to invite you by sharing your email.
+          </p>
+          <Button onClick={() => navigate('/')}>Go to Documents</Button>
+        </div>
+      </Layout>
+    );
+  }
+
   if (docNotFound) {
     return (
       <Layout>
@@ -148,6 +186,11 @@ export function EditorPage() {
         </div>
         <aside className={`editor-page__sidebar ${!sidebarOpen ? 'editor-page__sidebar--collapsed' : ''}`}>
           <UserPresence users={users} variant="full" />
+          <CollaboratorPanel
+            documentId={id}
+            isPublic={docIsPublic}
+            ownerId={docOwnerId}
+          />
           <RevisionPanel
             documentId={id}
             ydoc={ydoc}

@@ -146,7 +146,7 @@ describe('Document Controller', () => {
     it('should return 404 if document not found', async () => {
       Document.findById.mockReturnValue({
         populate: vi.fn().mockReturnThis(),
-        select: vi.fn().mockResolvedValue(null),
+        then: vi.fn().mockImplementation((fn) => Promise.resolve(null).then(fn)),
       });
 
       const req = mockReq({ params: { id: 'nonexistent' } });
@@ -158,10 +158,15 @@ describe('Document Controller', () => {
     });
 
     it('should return document on success', async () => {
-      const mockDoc = { _id: 'doc123', title: 'Test' };
+      const mockDoc = { 
+        _id: 'doc123', 
+        title: 'Test', 
+        isPublic: true,
+        toJSON: function() { return this; }
+      };
       Document.findById.mockReturnValue({
         populate: vi.fn().mockReturnThis(),
-        select: vi.fn().mockResolvedValue(mockDoc),
+        then: vi.fn().mockImplementation((fn) => Promise.resolve(mockDoc).then(fn)),
       });
 
       const req = mockReq({ params: { id: 'doc123' } });
@@ -172,7 +177,7 @@ describe('Document Controller', () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: true,
-          data: { document: mockDoc },
+          data: { document: expect.objectContaining({ _id: 'doc123' }) },
         })
       );
     });
@@ -195,6 +200,7 @@ describe('Document Controller', () => {
         _id: 'doc123',
         title: 'Old Title',
         owner: 'user123',
+        isPublic: true,
         save: vi.fn().mockResolvedValue(true),
         populate: vi.fn().mockResolvedValue(true),
       };
@@ -261,7 +267,7 @@ describe('Document Controller', () => {
 
   describe('createRevision', () => {
     it('should return 400 if no snapshot data provided', async () => {
-      Document.findById.mockResolvedValue({ _id: 'doc123' });
+      Document.findById.mockResolvedValue({ _id: 'doc123', isPublic: true });
 
       const req = mockReq({ params: { id: 'doc123' }, body: { label: 'test' } });
       const res = mockRes();
@@ -275,6 +281,7 @@ describe('Document Controller', () => {
       const mockDoc = {
         _id: 'doc123',
         title: 'Test',
+        isPublic: true,
         revisions: [],
         save: vi.fn().mockResolvedValue(true),
       };

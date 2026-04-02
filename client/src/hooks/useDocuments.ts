@@ -31,18 +31,19 @@ export function useDocuments() {
   }, [token]);
 
   const createDocument = useCallback(
-    async (title?: string) => {
+    async (title?: string, isPublic?: boolean, collaboratorEmails?: string[]) => {
       if (!token) return null;
       setError(null);
-      log.info(`Creating document: "${title || 'Untitled Document'}"`);
+      log.info(`Creating document: "${title || 'Untitled Document'}" (${isPublic ? 'public' : 'private'})`);
       try {
-        const response = await documentsApi.create(token, title);
+        const response = await documentsApi.create(token, title, isPublic, collaboratorEmails);
         const newDoc = response.data?.document;
         if (newDoc) {
           setDocuments((prev) => [newDoc, ...prev]);
           log.info(`Document created: "${newDoc.title}" (${newDoc._id})`);
         }
-        return newDoc || null;
+        // Return warnings alongside the doc
+        return { document: newDoc || null, warnings: response.data?.warnings || [] };
       } catch (err) {
         const message = err instanceof ApiError ? err.message : 'Failed to create document';
         log.error('Document creation failed:', message);
