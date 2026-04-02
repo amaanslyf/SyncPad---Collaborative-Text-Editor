@@ -5,6 +5,7 @@ import { DocumentCard, CreateDocumentCard } from './DocumentCard';
 import { Spinner } from '../common/Spinner';
 import { useToast } from '../common/Toast';
 import { ConfirmationModal } from '../common/ConfirmationModal';
+import { ApiError } from '../../services/api';
 import './Documents.css';
 
 export function DocumentList() {
@@ -36,7 +37,9 @@ export function DocumentList() {
       await deleteDocument(deleteId);
       showToast('Document deleted', 'success');
     } catch (err) {
-      showToast('Failed to delete document', 'error');
+      // Use the specific error message from the server (e.g. "Only the owner can delete this document")
+      const message = err instanceof ApiError ? err.message : 'Failed to delete document';
+      showToast(message, 'error');
     } finally {
       setDeleteId(null);
     }

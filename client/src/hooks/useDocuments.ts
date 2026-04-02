@@ -46,8 +46,7 @@ export function useDocuments() {
       } catch (err) {
         const message = err instanceof ApiError ? err.message : 'Failed to create document';
         log.error('Document creation failed:', message);
-        setError(message);
-        return null;
+        throw err;
       }
     },
     [token]
@@ -65,7 +64,7 @@ export function useDocuments() {
       } catch (err) {
         const message = err instanceof ApiError ? err.message : 'Failed to delete document';
         log.error(`Document deletion failed for ${id}:`, message);
-        setError(message);
+        throw err;
       }
     },
     [token]
@@ -83,7 +82,7 @@ export function useDocuments() {
       } catch (err) {
         const message = err instanceof ApiError ? err.message : 'Failed to update title';
         log.error(`Title update failed for ${id}:`, message);
-        setError(message);
+        throw err;
       }
     },
     [token]

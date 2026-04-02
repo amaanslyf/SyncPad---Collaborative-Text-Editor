@@ -33,16 +33,15 @@ export function DocumentCard({ document: doc, onDelete }: DocumentCardProps) {
         {doc.isPublic && (
           <span 
             className="doc-card__badge" 
-            data-tooltip="Public document"
-            aria-label="Public document"
+            data-tooltip="Anyone with the link can view"
           >
-            🌍
+            Public
           </span>
         )}
       </div>
       <div className="doc-card__meta">
         <span className="doc-card__time">
-          ✎ {formatTimeAgo(doc.updatedAt)}
+          Updated {formatTimeAgo(doc.updatedAt)}
         </span>
         {doc.lastEditedBy && (
           <div className="doc-card__collaborators">
