@@ -23,7 +23,7 @@ A production-grade collaborative text editor built with CRDTs, WebSockets, and m
 
 | Resource | URL |
 |---|---|
-| **🌐 Live Application** | [https://syncpad.vercel.app](https://syncpad.vercel.app) |
+| **🌐 Live Application** | [https://syncpad-collaborative-editor.vercel.app/](https://syncpad-collaborative-editor.vercel.app/) |
 | **📂 GitHub Repository** | [https://github.com/amaanslyf/SyncPad---Collaborative-Text-Editor](https://github.com/amaanslyf/SyncPad---Collaborative-Text-Editor) |
 | **🎬 Demo Video** | [YouTube / Google Drive Link — Coming Soon](#) |
 
@@ -119,29 +119,33 @@ graph TB
         B["TipTap Rich Text Editor"]
         C["Yjs CRDT Document (Y.Doc)"]
         D["y-websocket Provider"]
-        E["Export Service (PDF/Word)"]
+        E["Hooks: useDocumentMetadata, useDocumentRevision"]
     end
 
     subgraph "Server — Node.js + Express"
         F["REST API (Express)"]
-        G["Custom WebSocket Server (ws)"]
-        H["JWT Auth Middleware"]
-        I["y-mongodb-provider"]
+        G["Modular WebSocket Service"]
+        H["RoomManager (Lifecycle)"]
+        I["Room (Yjs + Batching Persistence)"]
+        J["MessageHandler (Sync Protocol)"]
+        K["Auth (WS Upgrade Guard)"]
+        L["config.js (Env Validation)"]
     end
 
     subgraph "Database — MongoDB Atlas"
-        J["users collection"]
-        K["documents collection"]
-        L["yjs-documents collection"]
+        M["users collection"]
+        N["documents collection"]
+        O["yjs-documents collection"]
     end
 
     A --> B --> C
     C <-->|"Binary Sync Protocol"| D <-->|"ws://"| G
+    G --> H & I & J & K
     A -->|"HTTP REST"| F
-    F --> H --> F
-    F --> J
-    F --> K
-    G --> I --> L
+    F --> L --> F
+    F --> M
+    F --> N
+    I --> O
 ```
 
 ### Data Flow
@@ -173,30 +177,36 @@ SyncPad/
 │   │   │   ├── common/               # Reusable UI: Button, Modal, Toast, Spinner, Avatar
 │   │   │   ├── Documents/            # DocumentCard, CreateDocumentModal
 │   │   │   ├── Editor/               # CollaborativeEditor, EditorToolbar, CollaboratorPanel
-│   │   │   ├── Layout/               # Navbar, AppLayout
+│   │   │   ├── Layout/               # Header, Layout, Sidebar
 │   │   │   ├── Presence/             # PresenceBar (live user avatars)
 │   │   │   └── RevisionHistory/      # RevisionSidebar (snapshot save/restore)
 │   │   ├── contexts/                 # AuthContext (JWT session management)
-│   │   ├── hooks/                    # useCollaboration, useDocuments, usePresence
+│   │   ├── hooks/                    # useDocumentMetadata, useDocumentRevision, useDocuments
 │   │   ├── pages/                    # LoginPage, RegisterPage, HomePage, EditorPage
 │   │   ├── services/                 # api.ts (HTTP client), exportService.ts (PDF/Word)
-│   │   ├── styles/                   # index.css (design tokens), colors.ts, theme.ts
+│   │   ├── styles/                   # index.css (design tokens), colors.ts
+│   │   ├── constants.ts              # Centralized app constants and URLs
 │   │   ├── types/                    # TypeScript type definitions
 │   │   └── utils/                    # Logger utility
-│   ├── tests/                        # Vitest + RTL test suites (36 tests)
-│   ├── vite.config.ts                # Vite + Node polyfills configuration
+│   ├── tests/                        # Vitest + RTL test suites
+│   ├── vite.config.ts                # Vite + polyfills config
 │   └── package.json
 ├── server/                           # Node.js + Express backend
 │   ├── src/
-│   │   ├── config/                   # MongoDB connection (database.js)
+│   │   ├── config/                   # Centralized Configuration (config.js)
 │   │   ├── controllers/              # authController.js, documentController.js
 │   │   ├── middleware/               # auth.js (JWT), errorHandler.js, httpLogger.js
 │   │   ├── models/                   # User.js, Document.js (Mongoose schemas)
 │   │   ├── routes/                   # auth.js, documents.js (Express routers)
-│   │   ├── services/                 # websocket.js (custom Yjs WS), persistence.js
+│   │   ├── services/
+│   │   │   └── websocket/            # Service-Isolation Architecture
+│   │   │       ├── RoomManager.js    # Document-Room lifecycle
+│   │   │       ├── Room.js           # Yjs state and batch persistence
+│   │   │       ├── MessageHandler.js # Sync/Awareness protocols
+│   │   │       └── Auth.js           # Upgrade authentication
 │   │   ├── utils/                    # logger.js (structured logging)
 │   │   └── index.js                  # Server entry point
-│   ├── tests/                        # Vitest test suites (51 tests)
+│   ├── tests/                        # Vitest test suites
 │   └── package.json
 ├── .gitignore
 └── README.md                         # ← You are here
@@ -430,18 +440,17 @@ npm run build         # TypeScript compile + Vite production build
 
 ## 🎨 Design System
 
-SyncPad uses a custom **"Obsidian Violet"** design system featuring:
+SyncPad uses a custom **"Ethereal Obsidian"** design system featuring:
 
-- **Dark-mode first** — Deep navy/charcoal backgrounds (#0A0A0F, #12121A)
-- **Primary accent** — Vibrant purple (#6C63FF) with gradient CTAs
-- **Glassmorphism** — Frosted-glass cards with `backdrop-filter: blur`
-- **Typography** — Inter typeface with a precise 8-step size scale
-- **Micro-animations** — Smooth CSS transitions on every interaction (hover, focus, open/close)
-- **Custom tooltips** — CSS-only tooltip system (no external libraries)
-- **Toast notifications** — Slide-in success/error notifications with auto-dismiss
-- **Responsive** — Mobile-friendly layouts with breakpoints at 768px and 1024px
+- **Obsidian Monochrome** — A premium palette of deep midnights (#0C0C1F), pure blacks, and stark whites.
+- **Service Branding** — New high-end monochrome logo symbol integrated across ALL auth and editor states.
+- **Glassmorphism** — Frosted-obsidian surfaces with `backdrop-filter` and tonal depth via background shifts.
+- **Typography** — Hierarchical pairing of **Manrope** (Display) and **Inter** (Editor/UI).
+- **Subtle Gradients** — Minimalist linear gradients for primary CTAs (State → Slate).
+- **Responsive** — Mobile-first adaptive layout with optimized navigation for mid-sized tablets and desktop.
+- **Micro-animations** — Performance-tuned CSS animations for state transitions (FadeIn, ScaleIn, Pulse).
 
-All design tokens are defined in `client/src/styles/index.css` as CSS custom properties.
+All design tokens are defined in `client/src/styles/index.css` and `colors.ts`.
 
 ---
 
