@@ -59,7 +59,7 @@
 }
 
 .btn--ghost:hover:not(:disabled) {
-  background: rgba(168, 164, 255, 0.08);
+  background: var(--color-surface-container-highest);
   color: var(--color-on-surface);
 }
 
@@ -124,7 +124,7 @@
 
 .input:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(168, 164, 255, 0.15);
+  box-shadow: 0 0 0 3px var(--shadow-glow);
 }
 
 .input--error {
@@ -132,7 +132,7 @@
 }
 
 .input--error:focus {
-  box-shadow: 0 0 0 3px rgba(255, 110, 132, 0.15);
+  box-shadow: 0 0 0 3px var(--color-error-dim);
 }
 
 .input-error-text {
@@ -323,7 +323,7 @@
   background: var(--color-surface-container-high);
   border-color: var(--color-primary);
   color: var(--color-on-surface);
-  box-shadow: 0 0 16px rgba(168, 164, 255, 0.12);
+  box-shadow: 0 0 16px var(--shadow-glow);
 }
 
 .access-toggle__icon {

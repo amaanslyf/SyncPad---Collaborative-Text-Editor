@@ -133,15 +133,15 @@
 }
 
 .doc-card__badge--public {
-  background: rgba(168, 164, 255, 0.1);
+  background: var(--color-surface-container-high);
   color: var(--color-primary);
-  border: 1px solid rgba(168, 164, 255, 0.2);
+  border: 1px solid var(--glass-border);
 }
 
 .doc-card__badge--private {
-  background: rgba(255, 157, 207, 0.1);
-  color: var(--color-tertiary, #ff9dcf);
-  border: 1px solid rgba(255, 157, 207, 0.2);
+  background: var(--color-surface-container-high);
+  color: var(--color-tertiary);
+  border: 1px solid var(--glass-border);
 }
 
 .doc-card__collab-count {
@@ -178,7 +178,7 @@
 .doc-card--create:hover {
   border-color: var(--color-primary);
   color: var(--color-primary);
-  background: rgba(168, 164, 255, 0.04);
+  background: var(--color-surface-container-low);
   transform: translateY(-2px);
 }
 

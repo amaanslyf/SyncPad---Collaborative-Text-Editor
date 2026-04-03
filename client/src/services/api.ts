@@ -1,8 +1,9 @@
 import { createLogger } from '../utils/logger';
+import { API_CONFIG } from '../constants';
 
 const log = createLogger('API');
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_URL = API_CONFIG.BASE_URL;
 
 interface ApiOptions {
   method?: string;

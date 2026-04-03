@@ -65,8 +65,8 @@ export function LoginPage() {
               <svg width="48" height="48" viewBox="0 0 64 64" fill="none">
                 <defs>
                   <linearGradient id="auth-g" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="#a8a4ff" />
-                    <stop offset="100%" stopColor="#675df9" />
+                    <stop offset="0%" stopColor="var(--color-primary)" />
+                    <stop offset="100%" stopColor="var(--color-primary-dim)" />
                   </linearGradient>
                 </defs>
                 <rect width="64" height="64" rx="14" fill="var(--color-surface-container)" />

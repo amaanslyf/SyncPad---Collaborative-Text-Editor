@@ -17,52 +17,53 @@ export const colors = {
   surfaceContainerHighest: '#24233b',
   surfaceContainerLowest: '#000000',
   surfaceVariant: '#24233b',
-  surfaceTint: '#a8a4ff',
+  surfaceTint: '#FFFFFF',
 
-  // ─── Primary ────────────────────────────────────────────
-  primary: '#a8a4ff',
-  primaryDim: '#675df9',
-  primaryContainer: '#9995ff',
-  primaryFixed: '#9995ff',
-  primaryFixedDim: '#8a85ff',
-  onPrimary: '#1e009f',
-  onPrimaryContainer: '#16007d',
+  // ─── Primary (Monochrome Obsidian) ──────────────────────
+  primary: '#FFFFFF',
+  primaryDim: '#E6E3FB',
+  primaryContainer: '#2A2A43',
+  primaryFixed: '#E6E3FB',
+  primaryFixedDim: '#D1D0E0',
+  onPrimary: '#000000',
+  onPrimaryContainer: '#000000',
   onPrimaryFixed: '#000000',
 
   // ─── Secondary ──────────────────────────────────────────
-  secondary: '#9891ff',
-  secondaryDim: '#9891ff',
-  secondaryContainer: '#3d31ad',
-  secondaryFixed: '#d1ccff',
-  onSecondary: '#160074',
-  onSecondaryContainer: '#cfcbff',
+  secondary: '#E6E3FB',
+  secondaryDim: '#D1D0E0',
+  secondaryContainer: '#1D1D33',
+  secondaryFixed: '#E6E3FB',
+  onSecondary: '#000000',
+  onSecondaryContainer: '#FFFFFF',
 
   // ─── Tertiary (Accent) ─────────────────────────────────
-  tertiary: '#ff9dd0',
-  tertiaryDim: '#eb7bb8',
-  tertiaryContainer: '#fb88c6',
-  onTertiary: '#6c0f4c',
+  tertiary: '#FF9DD0',
+  tertiaryDim: '#EB7BB8',
+  tertiaryContainer: '#FB88C6',
+  onTertiary: '#6C0F4C',
 
   // ─── Error ──────────────────────────────────────────────
-  error: '#ff6e84',
-  errorDim: '#d73357',
-  errorContainer: '#a70138',
+  error: '#FF6E84',
+  errorDim: '#D73357',
+  errorContainer: '#A70138',
   onError: '#490013',
-  onErrorContainer: '#ffb2b9',
+  onErrorContainer: '#FFB2B9',
 
   // ─── Text / On Surface ─────────────────────────────────
-  onBackground: '#e6e3fb',
-  onSurface: '#e6e3fb',
-  onSurfaceVariant: '#aba9bf',
+  onBackground: '#E6E3FB',
+  onSurface: '#E6E3FB',
+  onSurfaceVariant: '#ABA9BF',
 
   // ─── Outline ────────────────────────────────────────────
   outline: '#757388',
   outlineVariant: '#474659',
 
   // ─── Inverse ────────────────────────────────────────────
-  inverseSurface: '#fcf8ff',
+  inverseSurface: '#FCF8FF',
   inverseOnSurface: '#545366',
-  inversePrimary: '#5044e3',
+  inversePrimary: '#FFFFFF',
+
 
   // ─── Semantic ───────────────────────────────────────────
   success: '#00D68F',

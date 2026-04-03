@@ -3,10 +3,11 @@ import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
 import { useAuth } from '../contexts/AuthContext';
 import { createLogger } from '../utils/logger';
+import { API_CONFIG } from '../constants';
 
 const log = createLogger('Collaboration');
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3001';
+const WS_URL = API_CONFIG.WS_URL;
 
 interface UseCollaborationOptions {
   documentId: string;

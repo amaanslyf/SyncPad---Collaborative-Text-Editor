@@ -25,9 +25,9 @@ const currentLevel = isDev ? LOG_LEVELS.debug : LOG_LEVELS.warn;
 
 const LEVEL_STYLES: Record<LogLevel, string> = {
   debug: 'color: #757388; font-weight: normal;',
-  info: 'color: #a8a4ff; font-weight: bold;',
+  info: 'color: #FFFFFF; font-weight: bold;',
   warn: 'color: #FFB800; font-weight: bold;',
-  error: 'color: #ff6e84; font-weight: bold;',
+  error: 'color: #FF6E84; font-weight: bold;',
 };
 
 interface Logger {

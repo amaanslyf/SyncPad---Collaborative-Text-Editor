@@ -1,11 +1,11 @@
-import 'dotenv/config';
+import config from './config/config.js';
 import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
 
 import connectDB from './config/db.js';
 import { initPersistence } from './services/persistence.js';
-import { setupWebSocket, flushAllDocuments } from './services/websocket.js';
+import { setupWebSocket, flushAllDocuments } from './services/websocket/index.js';
 import authRoutes from './routes/auth.js';
 import documentRoutes from './routes/documents.js';
 import errorHandler from './middleware/errorHandler.js';
@@ -19,7 +19,7 @@ const server = createServer(app);
 
 // ─── Middleware ────────────────────────────────────────────
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: config.corsOrigin,
   credentials: true,
 }));
 app.use(express.json({ limit: '10mb' }));
@@ -52,49 +52,34 @@ app.use((req, res) => {
 app.use(errorHandler);
 
 // ─── Start Server ─────────────────────────────────────────
-const PORT = process.env.PORT || 3001;
-
 const start = async () => {
   try {
     log.info('Starting SyncPad server...');
-
-    // Validate required env vars
-    if (!process.env.MONGODB_URI) {
-      log.error('MONGODB_URI environment variable is not set');
-      process.exit(1);
-    }
-    if (!process.env.JWT_SECRET) {
-      log.error('JWT_SECRET environment variable is not set');
-      process.exit(1);
-    }
 
     // Connect to MongoDB
     await connectDB();
 
     // Initialize Yjs persistence
-    initPersistence(process.env.MONGODB_URI);
+    initPersistence(config.mongodbUri);
 
     // Setup WebSocket server for Yjs sync
     setupWebSocket(server);
 
     // Start HTTP + WS server
-    server.listen(PORT, () => {
+    server.listen(config.port, () => {
       log.info(`
 ╔══════════════════════════════════════════╗
 ║       🚀 SyncPad Server Running         ║
 ║──────────────────────────────────────────║
-║  HTTP:  http://localhost:${PORT}            ║
-║  WS:    ws://localhost:${PORT}/ws/:docId    ║
-║  Mode:  ${(process.env.NODE_ENV || 'development').padEnd(28)}║
-║  CORS:  ${(process.env.CORS_ORIGIN || 'http://localhost:5173').padEnd(28)}║
+║  HTTP:  http://localhost:${config.port}            ║
+║  WS:    ws://localhost:${config.port}/ws/:docId    ║
+║  Mode:  ${config.nodeEnv.padEnd(28)}║
+║  CORS:  ${config.corsOrigin.padEnd(28)}║
 ╚══════════════════════════════════════════╝
       `);
     });
   } catch (error) {
-    log.error('Failed to start server:', {
-      message: error.message,
-      stack: error.stack,
-    });
+    log.error('Failed to start server:', error);
     process.exit(1);
   }
 };
@@ -105,10 +90,9 @@ process.on('unhandledRejection', (reason) => {
 });
 
 process.on('uncaughtException', (error) => {
-  log.error('Uncaught Exception:', { message: error.message, stack: error.stack });
+  log.error('Uncaught Exception:', error);
   process.exit(1);
 });
-
 
 // Graceful shutdown
 const shutdown = async (signal) => {
@@ -142,3 +126,4 @@ process.on('SIGINT', () => shutdown('SIGINT'));
 start();
 
 export default app;
+

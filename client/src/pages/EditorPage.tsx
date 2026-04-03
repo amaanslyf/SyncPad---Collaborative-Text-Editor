@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { Editor } from '@tiptap/react';
 import { Layout } from '../components/Layout/Layout';
@@ -12,19 +12,13 @@ import { Button } from '../components/common/Button';
 import { useCollaboration } from '../hooks/useCollaboration';
 import { usePresence } from '../hooks/usePresence';
 import { useAuth } from '../contexts/AuthContext';
-import { documentsApi, ApiError } from '../services/api';
-import { useToast } from '../components/common/Toast';
+import { useDocumentMetadata } from '../hooks/document/useDocumentMetadata';
+import { useDocumentRevision } from '../hooks/document/useDocumentRevision';
 
 export function EditorPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { token } = useAuth();
-  const { showToast } = useToast();
-  const [docTitle, setDocTitle] = useState('');
-  const [docNotFound, setDocNotFound] = useState(false);
-  const [accessDenied, setAccessDenied] = useState(false);
-  const [docIsPublic, setDocIsPublic] = useState(true);
-  const [docOwnerId, setDocOwnerId] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [editor, setEditor] = useState<Editor | null>(null);
 
@@ -33,81 +27,30 @@ export function EditorPage() {
     documentId: id || '',
   });
 
+  // Manage document metadata (fetching + title auto-sync)
+  const {
+    docTitle,
+    setDocTitle,
+    docNotFound,
+    accessDenied,
+    docIsPublic,
+    docOwnerId,
+    isLoading,
+  } = useDocumentMetadata({ id, token });
+
   // Track user presence
   const { users } = usePresence(provider);
 
-  // Fetch document metadata
-  useEffect(() => {
-    const fetchDoc = async () => {
-      if (!token || !id) return;
-      try {
-        const res = await documentsApi.get(token, id);
-        if (res.data?.document) {
-          setDocTitle(res.data.document.title);
-          setDocIsPublic(res.data.document.isPublic);
-          setDocOwnerId(res.data.document.owner?._id || '');
-        }
-      } catch (err) {
-        if (err instanceof ApiError) {
-          if (err.status === 404) {
-            setDocNotFound(true);
-          } else if (err.status === 403) {
-            setAccessDenied(true);
-          }
-        }
-      }
-    };
-    fetchDoc();
-  }, [token, id]);
+  // Manage revisions and snapshots
+  const {
+    handleGetSnapshot,
+    handleRestoreSnapshot,
+  } = useDocumentRevision({ editor });
 
-  // Debounced title update
-  useEffect(() => {
-    if (!token || !id || !docTitle) return;
-    const timeout = setTimeout(async () => {
-      try {
-        await documentsApi.update(token, id, { title: docTitle });
-      } catch {
-        // Silently fail title updates
-      }
-    }, 1000);
-    return () => clearTimeout(timeout);
-  }, [docTitle, token, id]);
 
-  // Get editor state as JSON string (base64 encoded) for revision snapshots
-  const handleGetSnapshot = useCallback((): string | null => {
-    if (!editor) return null;
-    try {
-      const jsonStr = JSON.stringify(editor.getJSON());
-      // API expects base64 string because it previously stored binary Yjs states
-      return btoa(unescape(encodeURIComponent(jsonStr)));
-    } catch {
-      return null;
-    }
-  }, [editor]);
-
-  // Restore document from JSON snapshot (base64 encoded)
-  const handleRestoreSnapshot = useCallback(
-    (snapshotStr: string) => {
-      if (!editor) return;
-      try {
-        let content;
-        try {
-          const jsonStr = decodeURIComponent(escape(atob(snapshotStr)));
-          content = JSON.parse(jsonStr);
-        } catch {
-          throw new Error('Incompatible snapshot format. Only new snapshots can be restored.');
-        }
-
-        // Tiptap handles the transaction and Yjs translation automatically!
-        editor.commands.setContent(content);
-        showToast('Document restored from snapshot', 'success');
-      } catch (err) {
-        console.error('Failed to restore snapshot:', err);
-        showToast(err instanceof Error ? err.message : 'Failed to restore snapshot', 'error');
-      }
-    },
-    [editor, showToast]
-  );
+  if (isLoading && !docNotFound && !accessDenied) {
+    return <FullPageSpinner />;
+  }
 
   // Access denied state
   if (accessDenied) {

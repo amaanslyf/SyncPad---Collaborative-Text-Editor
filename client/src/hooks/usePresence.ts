@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { type WebsocketProvider } from 'y-websocket';
 import { useAuth } from '../contexts/AuthContext';
 import { createLogger } from '../utils/logger';
+import { colors } from '../styles/colors';
 
 const log = createLogger('Presence');
 
@@ -47,7 +48,7 @@ export function usePresence(provider: WebsocketProvider | null): UsePresenceRetu
           uniqueUsers.set(state.user.name, {
             clientId,
             name: state.user.name || 'Anonymous',
-            color: state.user.color || '#a8a4ff',
+            color: state.user.color || colors.primary,
             cursor: state.cursor || null,
           });
         }

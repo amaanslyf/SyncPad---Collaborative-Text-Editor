@@ -17,26 +17,27 @@
   --color-surface-container-lowest: #000000;
   --color-surface-variant: #24233b;
 
-  /* Colors — Primary */
-  --color-primary: #a8a4ff;
-  --color-primary-dim: #675df9;
-  --color-primary-container: #9995ff;
-  --color-on-primary: #1e009f;
+  /* Colors — Primary (Monochrome Obsidian) */
+  --color-primary: #FFFFFF;
+  --color-primary-dim: #E6E3FB;
+  --color-primary-container: #2A2A43;
+  --color-on-primary: #000000;
   --color-on-primary-fixed: #000000;
 
   /* Colors — Secondary */
-  --color-secondary: #9891ff;
-  --color-secondary-container: #3d31ad;
-  --color-on-secondary-container: #cfcbff;
+  --color-secondary: #E6E3FB;
+  --color-secondary-container: #1D1D33;
+  --color-on-secondary-container: #FFFFFF;
 
   /* Colors — Tertiary */
-  --color-tertiary: #ff9dd0;
-  --color-tertiary-dim: #eb7bb8;
+  --color-tertiary: #FF9DD0;
+  --color-tertiary-dim: #EB7BB8;
 
   /* Colors — Error */
-  --color-error: #ff6e84;
-  --color-error-dim: #d73357;
-  --color-on-error-container: #ffb2b9;
+  --color-error: #FF6E84;
+  --color-error-dim: #D73357;
+  --color-on-error-container: #FFB2B9;
+
 
   /* Colors — Text */
   --color-on-background: #e6e3fb;
@@ -91,8 +92,8 @@
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
   --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.5);
   --shadow-ambient: 0 8px 32px -4px rgba(230, 227, 251, 0.06);
-  --shadow-glow: 0 0 20px rgba(168, 164, 255, 0.3);
-  --shadow-glow-strong: 0 0 40px rgba(168, 164, 255, 0.4);
+  --shadow-glow: 0 0 20px rgba(255, 255, 255, 0.15);
+  --shadow-glow-strong: 0 0 40px rgba(255, 255, 255, 0.2);
 
   /* Glass */
   --glass-bg: rgba(36, 35, 59, 0.6);

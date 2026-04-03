@@ -10,6 +10,7 @@ import type * as Y from 'yjs';
 import { useAuth } from '../../contexts/AuthContext';
 import { EditorToolbar } from './EditorToolbar';
 import { Spinner } from '../common/Spinner';
+import { colors } from '../../styles/colors';
 import './Editor.css';
 
 interface CollaborativeEditorProps {
@@ -49,7 +50,7 @@ export function CollaborativeEditor({
               provider,
               user: {
                 name: user?.displayName || 'Anonymous',
-                color: user?.color || '#a8a4ff',
+                color: user?.color || colors.primary,
               },
             }),
           ]

@@ -1,6 +1,6 @@
 import Document from '../models/Document.js';
 import User from '../models/User.js';
-import { disconnectUserFromDoc, destroyRoom } from '../services/websocket.js';
+import { disconnectUserFromDoc, destroyRoom } from '../services/websocket/index.js';
 import { getPersistence } from '../services/persistence.js';
 import { createLogger } from '../utils/logger.js';
 
