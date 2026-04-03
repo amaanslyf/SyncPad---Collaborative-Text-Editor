@@ -33,11 +33,7 @@ export function LoginPage() {
         
         <div className="login-hero">
           <div className="login-hero__logo">
-            <svg width="32" height="32" viewBox="0 0 64 64" fill="none">
-              <rect width="64" height="64" rx="12" fill="var(--color-primary)" />
-              <path d="M18 18h28a2 2 0 012 2v24a2 2 0 01-2 2H18a2 2 0 01-2-2V20a2 2 0 012-2z" stroke="white" strokeWidth="3" fill="none" />
-              <line x1="22" y1="24" x2="42" y2="24" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-            </svg>
+            <img src="/assets/logo.png" alt="SyncPad Logo" className="login-hero__logo-img" />
             <span>SyncPad</span>
           </div>
           <h1 className="login-hero__title">
@@ -62,19 +58,7 @@ export function LoginPage() {
         <div className="login-auth">
           <div className="auth-card glass">
             <div className="auth-card__logo">
-              <svg width="48" height="48" viewBox="0 0 64 64" fill="none">
-                <defs>
-                  <linearGradient id="auth-g" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="var(--color-primary)" />
-                    <stop offset="100%" stopColor="var(--color-primary-dim)" />
-                  </linearGradient>
-                </defs>
-                <rect width="64" height="64" rx="14" fill="var(--color-surface-container)" />
-                <path d="M18 16h28a2 2 0 012 2v28a2 2 0 01-2 2H18a2 2 0 01-2-2V18a2 2 0 012-2z" stroke="url(#auth-g)" strokeWidth="2.5" fill="none" />
-                <line x1="22" y1="24" x2="42" y2="24" stroke="url(#auth-g)" strokeWidth="2" strokeLinecap="round" />
-                <line x1="22" y1="30" x2="38" y2="30" stroke="url(#auth-g)" strokeWidth="2" strokeLinecap="round" opacity="0.7" />
-                <line x1="22" y1="36" x2="34" y2="36" stroke="url(#auth-g)" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
-              </svg>
+              <img src="/assets/logo.png" alt="SyncPad Logo" className="auth-card__logo-img" />
             </div>
             <h1 className="auth-card__title">Welcome back</h1>
             <p className="auth-card__subtitle">Sign in to SyncPad to continue collaborating</p>

@@ -50,10 +50,16 @@
   align-items: center;
   gap: var(--spacing-3);
   font-size: var(--font-size-2xl);
-  font-weight: 800;
-  color: var(--color-primary);
+  font-weight: 900;
+  color: var(--color-on-surface);
   margin-bottom: var(--spacing-10);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.04em;
+}
+
+.login-hero__logo-img {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
 }
 
 .login-hero__title {
@@ -127,6 +133,13 @@
   display: flex;
   justify-content: center;
   margin-bottom: var(--spacing-8);
+}
+
+.auth-card__logo-img {
+  height: 80px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px var(--shadow-glow));
 }
 
 .auth-card__title {

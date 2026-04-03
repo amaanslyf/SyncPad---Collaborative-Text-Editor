@@ -20,6 +20,12 @@
   z-index: var(--z-sticky);
 }
 
+.header__back-btn {
+  width: 44px;
+  height: 44px;
+  font-size: var(--font-size-xl);
+}
+
 .header__left {
   display: flex;
   align-items: center;
@@ -34,9 +40,10 @@
   color: var(--color-on-surface);
 }
 
-.header__logo-icon {
-  width: 32px;
+.header__logo-img {
   height: 32px;
+  width: auto;
+  object-fit: contain;
 }
 
 .header__logo-text {

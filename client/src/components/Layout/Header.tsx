@@ -26,7 +26,7 @@ export function Header({ docTitle, onTitleChange, isConnected, showBack }: Heade
         {showBack && (
           <Link 
             to="/" 
-            className="btn btn--ghost btn--icon" 
+            className="btn btn--ghost btn--icon header__back-btn" 
             aria-label="Back to documents"
             data-tooltip="Back to documents"
             data-tooltip-pos="bottom"
@@ -35,19 +35,7 @@ export function Header({ docTitle, onTitleChange, isConnected, showBack }: Heade
           </Link>
         )}
         <Link to="/" className="header__logo">
-          <svg className="header__logo-icon" viewBox="0 0 64 64" fill="none">
-            <defs>
-              <linearGradient id="logo-g" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stopColor="var(--color-primary)" />
-                <stop offset="100%" stopColor="var(--color-primary-dim)" />
-              </linearGradient>
-            </defs>
-            <rect width="64" height="64" rx="14" fill="var(--color-surface-container)" />
-            <path d="M18 16h28a2 2 0 012 2v28a2 2 0 01-2 2H18a2 2 0 01-2-2V18a2 2 0 012-2z" stroke="url(#logo-g)" strokeWidth="2.5" fill="none" />
-            <line x1="22" y1="24" x2="42" y2="24" stroke="url(#logo-g)" strokeWidth="2" strokeLinecap="round" />
-            <line x1="22" y1="30" x2="38" y2="30" stroke="url(#logo-g)" strokeWidth="2" strokeLinecap="round" opacity="0.7" />
-            <line x1="22" y1="36" x2="34" y2="36" stroke="url(#logo-g)" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
-          </svg>
+          <img src="/assets/logo.png" alt="SyncPad Logo" className="header__logo-img" />
           <span className="header__logo-text">SyncPad</span>
         </Link>
       </div>
