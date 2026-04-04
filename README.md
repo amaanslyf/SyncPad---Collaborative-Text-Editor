@@ -401,33 +401,6 @@ npm run build         # TypeScript compile + Vite production build
 
 ---
 
-## 🚢 Deployment
-
-### Frontend → Vercel
-
-1. Go to [vercel.com](https://vercel.com) and import your GitHub repository
-2. Set **Root Directory** to `client`
-3. Set **Build Command** to `npm run build`
-4. Set **Output Directory** to `dist`
-5. Add environment variables:
-   - `VITE_API_URL` = `https://your-backend.onrender.com/api`
-   - `VITE_WS_URL` = `wss://your-backend.onrender.com`
-6. Deploy
-
-### Backend → Render
-
-1. Go to [render.com](https://render.com) and create a **New Web Service**
-2. Connect your GitHub repository
-3. Set **Root Directory** to `server`
-4. Set **Build Command** to `npm install`
-5. Set **Start Command** to `node src/index.js`
-6. Add environment variables:
-   - `MONGODB_URI` = your MongoDB Atlas connection string
-   - `JWT_SECRET` = a strong random string
-   - `JWT_EXPIRES_IN` = `7d`
-   - `CORS_ORIGIN` = `https://your-app.vercel.app`
-   - `NODE_ENV` = `production`
-7. Deploy
 
 ### Database → MongoDB Atlas
 
