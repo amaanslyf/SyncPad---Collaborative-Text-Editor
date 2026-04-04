@@ -25,7 +25,7 @@ A production-grade collaborative text editor built with CRDTs, WebSockets, and m
 |---|---|
 | **🌐 Live Application** | [https://syncpad-collaborative-editor.vercel.app/](https://syncpad-collaborative-editor.vercel.app/) |
 | **📂 GitHub Repository** | [https://github.com/amaanslyf/SyncPad---Collaborative-Text-Editor](https://github.com/amaanslyf/SyncPad---Collaborative-Text-Editor) |
-| **🎬 Demo Video** | [YouTube / Google Drive Link — Coming Soon](#) |
+| **🎬 Demo Video** | [Google Drive Link](https://drive.google.com/file/d/1BPjEC6DBELygt0fG2D7qn9vq4mERBnjz/view?usp=sharing) |
 
 ---
 
